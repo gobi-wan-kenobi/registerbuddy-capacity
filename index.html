@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RegisterBuddy — Capacity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F0E9; --surface:#FBF9F5; --ink:#14213D; --ink-2:#2E3A55; --muted:#5E6779; --line:#DED8CC; --line-strong:#BDB4A3;
+  --module:#1F4E89; --module-ink:#FBF9F5; --module-soft:#E3EAF3;
+  --appt:#F2CFAF; --appt-ink:#3B2A18;
+  --k-overlap:#D93B3B; --k-nodr:#F2D42C; --k-nodr-ink:#2A2400; --k-reader:#2E6FD6; --k-scribe:#4FAE62; --k-exam:#C7362F;
+  --ok:#2C7A4B; --warn:#A8651A; --bad:#B8322B;
+  --stage:#101A30; --stage-2:#172341; --stage-ink:#EDE8DC; --stage-muted:#9AA3B8; --stage-line:#2A3653;
+  --radius:3px;
+  --display:"Fraunces","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+:root:not([data-theme="light"]){ @media (prefers-color-scheme: dark){
+  --paper:#15171B; --surface:#1D2026; --ink:#E8E4DA; --ink-2:#CFCAC0; --muted:#9AA0AC; --line:#2E323A; --line-strong:#464C57;
+  --module:#6E9FD8; --module-ink:#0F1726; --module-soft:#1E2A3D;
+  --appt:#6E4A2E; --appt-ink:#F5E7D6; --k-nodr:#D9BE1F; --k-nodr-ink:#1A1600;
+}}
+:root[data-theme="dark"]{
+  --paper:#15171B; --surface:#1D2026; --ink:#E8E4DA; --ink-2:#CFCAC0; --muted:#9AA0AC; --line:#2E323A; --line-strong:#464C57;
+  --module:#6E9FD8; --module-ink:#0F1726; --module-soft:#1E2A3D;
+  --appt:#6E4A2E; --appt-ink:#F5E7D6; --k-nodr:#D9BE1F; --k-nodr-ink:#1A1600;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;font-feature-settings:"tnum" 1}
+body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button{font:inherit;color:inherit}
+a{color:var(--module)}
+h1,h2,h3,.disp{font-family:var(--display);font-weight:500;letter-spacing:-.01em}
+.num{font-family:var(--display);font-weight:500;font-variation-settings:"opsz" 72;letter-spacing:-.02em}
+
+/* top bar */
+.topbar{display:flex;align-items:center;gap:16px;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--line);flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);z-index:30}
+.brand{font-family:var(--display);font-size:17px;font-weight:600;letter-spacing:0}
+.brand span{color:var(--muted);font-weight:400;font-style:italic}
+.tabs{display:flex;gap:2px;margin-left:8px}
+.tab{padding:9px 12px;border:0;background:transparent;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.tab .ph{display:inline-block;margin-left:6px;font-size:10.5px;padding:1px 6px;border-radius:2px;background:var(--stage);color:var(--stage-ink);letter-spacing:.04em;text-transform:uppercase}
+.site{margin-left:auto;color:var(--muted);text-align:right;line-height:1.3;font-size:12.5px}
+.site b{color:var(--ink);font-weight:500}
+.demo{display:flex;align-items:center;gap:8px;margin-left:12px;padding:4px 6px 4px 10px;border:1px dashed var(--line-strong);border-radius:20px;font-size:12px;color:var(--muted)}
+.demo select{font:inherit;font-size:12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:12px;padding:3px 8px}
+.demo .sw{display:flex;align-items:center;gap:6px;cursor:pointer}
+.mode-tag{font-size:11px;padding:2px 7px;border-radius:10px;background:var(--stage);color:var(--stage-ink);font-weight:600}
+body.mode-product .mode-tag{background:var(--line);color:var(--muted)}
+@media (max-width:900px){.demo{margin-left:0;width:100%;justify-content:space-between}}
+
+/* shell */
+.shell{display:grid;grid-template-columns:272px 1fr;min-height:calc(100vh - 52px)}
+@media (max-width:900px){.shell{grid-template-columns:1fr}}
+body.mode-product .rail{display:none}
+body.mode-product .shell{grid-template-columns:1fr}
+body.mode-product .tab .ph, body.mode-product .panel h3 .ph, body.mode-product .chart h3 .ph{display:none}
+body.mode-product .tele-btn, body.mode-product .tele{display:none}
+body.mode-product .presenter{display:none}
+.tab[hidden]{display:none}
+
+/* presenter rail — the dark backstage layer */
+.rail{background:var(--stage);color:var(--stage-ink);padding:18px 16px 24px;border-right:1px solid var(--stage-line)}
+@media (max-width:900px){.rail{border-right:0;border-bottom:1px solid var(--stage-line)}}
+.rail h2{font-size:15px;margin:0 0 4px;color:var(--stage-ink)}
+.rail p.lead{margin:0 0 14px;color:var(--stage-muted);font-size:12.5px}
+.viewas{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap}
+.viewas button{padding:5px 9px;border:1px solid var(--stage-line);background:var(--stage-2);border-radius:var(--radius);cursor:pointer;font-size:12px;color:var(--stage-ink)}
+.viewas button[aria-pressed="true"]{background:var(--stage-ink);color:var(--stage);border-color:var(--stage-ink)}
+.phase{position:relative;padding:10px 0 14px 22px;border-left:1px solid var(--stage-line)}
+.phase:before{content:"";position:absolute;left:-6px;top:15px;width:11px;height:11px;border-radius:50%;background:var(--stage);border:1.5px solid var(--stage-muted)}
+.phase.done:before{background:var(--k-scribe);border-color:var(--k-scribe)}
+.phase.active:before{background:var(--k-nodr);border-color:var(--k-nodr)}
+.phase.locked{opacity:.5}
+.phase .name{font-family:var(--display);font-size:15px;font-weight:500}
+.phase .when{color:var(--stage-muted);font-size:12px;margin-top:1px}
+.phase .gate{margin-top:7px;font-size:12px;padding:8px 10px;border-radius:var(--radius);background:var(--stage-2);border:1px solid var(--stage-line);color:var(--stage-ink)}
+.phase .gate b{font-weight:600;color:var(--k-nodr)}
+.phase .status{display:inline-block;margin-top:6px;font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid var(--stage-line);color:var(--stage-muted)}
+.phase.done .status{border-color:var(--k-scribe);color:var(--k-scribe)}
+.phase.active .status{border-color:var(--k-nodr);color:var(--k-nodr)}
+.rail .note{color:var(--stage-muted)}
+
+/* main */
+.main{padding:22px 24px 48px;min-width:0}
+.view{display:none}.view.on{display:block;animation:rise .25s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.viewhead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--ink)}
+.viewhead h1{font-size:26px;margin:0}
+.viewhead .sub{color:var(--muted);font-size:13px}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px 9px;position:relative}
+.stat .l{font-size:12px;color:var(--muted);line-height:1.3}
+.stat .v{font-family:var(--display);font-size:30px;font-weight:500;line-height:1.05;margin-top:4px;letter-spacing:-.02em}
+.stat .v small{font-family:var(--body);font-size:12px;font-weight:400;color:var(--muted);margin-left:5px;letter-spacing:0}
+.stat.bad .v{color:var(--bad)}.stat.warn .v{color:var(--warn)}.stat.ok .v{color:var(--ok)}
+.split{display:grid;grid-template-columns:1fr 310px;gap:16px}
+@media (max-width:1100px){.split{grid-template-columns:1fr}}
+
+/* board */
+.boardwrap{overflow-x:auto;border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--radius)}
+.board{display:grid;grid-auto-rows:14px;min-width:1500px;position:relative}
+.board .hd{position:sticky;top:0;z-index:2;background:var(--surface);border-bottom:1px solid var(--ink);padding:7px 4px 5px;font-size:12px;font-weight:600;text-align:center;line-height:1.2}
+.board .hd.group{border-left:2px solid var(--ink)}
+.board .hd small{display:block;font-weight:400;color:var(--muted);font-style:italic}
+.board .time{position:sticky;left:0;z-index:1;background:var(--surface);font-size:11px;color:var(--muted);padding:0 6px;border-right:1px solid var(--line-strong);text-align:right;line-height:14px}
+.board .time.used{text-decoration:line-through;color:var(--k-exam)}
+.board .time.free{background:var(--k-nodr);color:var(--k-nodr-ink);text-decoration:none;font-weight:600}
+.board .cell{border-right:1px solid var(--line);border-bottom:1px dotted var(--line)}
+.board .cell.hall{background:color-mix(in srgb,var(--module-soft) 40%,transparent)}
+.appt{background:var(--appt);color:var(--appt-ink);border:1px solid color-mix(in srgb,var(--appt-ink) 30%,transparent);border-radius:2px;margin:1px;padding:4px 6px;font-size:11px;line-height:1.25;overflow:hidden;z-index:1;cursor:pointer;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.appt .t{font-family:var(--display);font-size:11.5px;font-weight:600;letter-spacing:0}
+.appt .n{font-weight:600;margin-top:2px}
+.appt .i{opacity:.75}
+.flag{display:inline-block;margin-top:3px;margin-right:2px;padding:1px 5px;border-radius:2px;font-size:10.5px;font-weight:600}
+.f-nodr{background:var(--k-nodr);color:var(--k-nodr-ink)}
+.f-reader{background:var(--k-reader);color:#fff}
+.f-scribe{background:var(--k-scribe);color:#fff}
+.f-tts{background:var(--k-reader);color:#fff}
+.f-exam{background:transparent;color:var(--k-exam);border:1px solid var(--k-exam)}
+.f-gave{background:transparent;color:var(--appt-ink);border:1px dashed currentColor;font-weight:500}
+.appt.resolved{outline:2px solid var(--ok)}
+.key{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 0;font-size:12px;color:var(--muted)}
+.key span{display:inline-flex;align-items:center;gap:5px}
+.key i{width:12px;height:12px;border-radius:2px;display:inline-block}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px}
+.panel h3{margin:0 0 8px;font-size:16px}
+.panel h3 .ph{font-family:var(--body);font-size:10.5px;font-weight:600;margin-left:6px;padding:1px 6px;border-radius:2px;background:var(--stage);color:var(--stage-ink);letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
+.exc{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:12.5px}
+.exc:first-of-type{border-top:0}
+.exc .dot{width:10px;height:10px;border-radius:2px;flex:none;margin-top:4px}
+.exc .dot.nodr{background:var(--k-nodr)}.exc .dot.reader{background:var(--k-reader)}.exc .dot.exam{background:var(--k-exam)}.exc .dot.slot{background:var(--muted)}
+.exc b{font-weight:600}
+.whatif{margin-top:14px}
+.whatif .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px}
+.whatif .row:first-of-type{border-top:0}
+.tog{width:38px;height:22px;border-radius:11px;border:1px solid var(--line-strong);background:var(--paper);position:relative;cursor:pointer;flex:none}
+.tog:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .15s}
+.tog[aria-checked="true"]{background:var(--ink);border-color:var(--ink)}
+.tog[aria-checked="true"]:after{background:var(--paper);transform:translateX(16px)}
+
+/* projection */
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px 10px}
+.chart h3{margin:0 0 2px;font-size:17px}
+.chart .basis{color:var(--muted);font-size:12px;margin-bottom:12px;max-width:820px}
+.bars{display:grid;grid-template-columns:repeat(10,1fr);gap:10px;align-items:end;height:200px;border-bottom:1px solid var(--ink);position:relative;padding-top:20px}
+.cap-line{position:absolute;left:0;right:0;border-top:1.5px dashed var(--ink);pointer-events:none}
+.cap-line span{position:absolute;right:0;top:-18px;font-size:11px;color:var(--ink);background:var(--surface);padding:0 4px;font-style:italic}
+.bar{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bar .fill{background:var(--appt);border:1px solid color-mix(in srgb,var(--appt-ink) 30%,transparent);border-bottom:0;border-radius:2px 2px 0 0}
+.bar .fill.over{background:var(--k-nodr)}
+.bar .val{position:absolute;top:-16px;left:0;right:0;text-align:center;font-family:var(--display);font-size:13px;color:var(--ink)}
+.bar .ci{position:absolute;left:50%;width:0;border-left:1px solid var(--ink);opacity:.35}
+.days{display:grid;grid-template-columns:repeat(10,1fr);gap:10px;font-size:11px;color:var(--muted);text-align:center;margin-top:6px}
+.alerts{margin-top:16px}
+.alert{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:10px 0;border-top:1px solid var(--line);font-size:12.5px}
+.alert:first-of-type{border-top:0}
+.alert .sev{width:9px;height:9px;border-radius:50%;margin-top:6px}
+.alert .sev.over{background:var(--bad)}.alert .sev.under{background:var(--warn)}.alert .sev.lead{background:var(--module)}
+.alert .when{color:var(--muted);white-space:nowrap;font-style:italic}
+
+/* recommendations */
+.recs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.rec{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px;display:flex;flex-direction:column;gap:6px}
+.rec > div:first-child{font-family:var(--display);font-size:15.5px;line-height:1.25}
+.rec .why{color:var(--muted);font-size:12.5px}
+.rec .fx{font-size:12.5px}
+.rec .fx b{color:var(--ok);font-weight:600}
+.rec .act{display:flex;gap:6px;margin-top:auto;padding-top:8px}
+.btn{padding:7px 11px;border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--radius);cursor:pointer;font-size:12.5px}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn[aria-pressed="true"]{background:var(--ok);color:#fff;border-color:var(--ok)}
+
+/* the report — styled like a printed document */
+.report{margin-top:16px;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius);padding:22px 26px 20px;max-width:780px;position:relative}
+.report:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--ink)}
+.report h3{margin:0 0 3px;font-size:22px}
+.report .to{color:var(--muted);font-size:12px;margin-bottom:12px;letter-spacing:.02em}
+.report table{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}
+.report td{padding:7px 0;border-top:1px solid var(--line)}
+.report td:last-child{text-align:right;font-family:var(--display);font-size:15px;font-weight:500}
+.report .ask{margin-top:12px;padding:11px 13px;background:var(--module-soft);border-left:0;border-radius:var(--radius);font-size:13px;line-height:1.5}
+.note{color:var(--muted);font-size:12px;margin-top:10px;max-width:780px}
+.locked-msg{padding:56px 20px;text-align:center;color:var(--muted);max-width:560px;margin:0 auto}
+.locked-msg b{color:var(--ink);display:block;margin-bottom:8px;font-family:var(--display);font-size:20px;font-weight:500}
+
+/* pilot page */
+.pilot{max-width:820px}
+.pilot .banner{display:flex;gap:10px;align-items:center;padding:9px 12px;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius);font-size:12.5px;margin-bottom:14px}
+.pilot .banner b{font-weight:600;padding:1px 7px;background:var(--k-nodr);color:var(--k-nodr-ink);border-radius:2px;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.pilot .banner .end{margin-left:auto;color:var(--muted);font-style:italic}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding:6px 0 18px;margin-bottom:14px;border-bottom:1px solid var(--ink)}
+.hero .big{font-family:var(--display);font-size:96px;line-height:.9;font-weight:500;letter-spacing:-.04em;color:var(--bad)}
+.hero .cap{font-family:var(--display);font-size:20px;line-height:1.3;max-width:520px}
+.hero .cap small{display:block;font-family:var(--body);font-size:12.5px;color:var(--muted);margin-top:6px;letter-spacing:0}
+@media (max-width:600px){.hero{grid-template-columns:1fr}.hero .big{font-size:72px}}
+.prompt{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.prompt h3{margin:0 0 8px;font-size:17px}
+.prompt .opts{display:flex;gap:6px;margin:6px 0 8px}
+.prompt textarea{width:100%;min-height:60px;border:1px solid var(--line-strong);border-radius:var(--radius);padding:8px 9px;font:inherit;background:var(--paper);color:var(--ink);resize:vertical}
+.prompt .thanks{color:var(--ok);font-size:12.5px;margin-top:6px;display:none}
+
+/* telemetry — same dark backstage layer as the rail */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--stage);color:var(--stage-ink);padding:8px 14px;border-radius:var(--radius);font-size:12.5px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.toast.show{opacity:1}
+.tele-btn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;padding:9px 13px;border:1px solid var(--stage-line);background:var(--stage);color:var(--stage-ink);border-radius:20px;cursor:pointer;font-size:12.5px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.tele-btn .n{display:inline-block;min-width:18px;text-align:center;margin-left:6px;padding:0 5px;border-radius:9px;background:var(--k-nodr);color:var(--k-nodr-ink);font-size:11px;font-weight:600}
+.tele{position:fixed;right:0;top:0;bottom:0;width:min(440px,100vw);background:var(--stage);color:var(--stage-ink);border-left:1px solid var(--stage-line);z-index:45;transform:translateX(100%);transition:transform .2s;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.tele.open{transform:none}
+.tele header{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--stage-line)}
+.tele header h3{margin:0;font-size:17px;color:var(--stage-ink)}
+.tele header button{margin-left:auto;background:transparent;color:var(--stage-ink);border-color:var(--stage-line)}
+.tele .body{overflow:auto;padding:14px 16px;font-size:12.5px}
+.tele .pass{padding:10px 12px;border:1px solid var(--stage-line);border-radius:var(--radius);background:var(--stage-2);margin-bottom:14px}
+.tele .pass b{font-weight:600}
+.tele .pass .cnt{font-family:var(--display);font-size:26px;font-weight:500;margin-top:4px;color:var(--k-nodr)}
+.tele table{width:100%;border-collapse:collapse;font-size:12px;margin:4px 0 12px}
+.tele th{text-align:left;color:var(--stage-muted);font-weight:500;padding:3px 0;border-bottom:1px solid var(--stage-line)}
+.tele td{padding:4px 6px 4px 0;border-top:1px solid var(--stage-line);vertical-align:top}
+.tele td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--k-nodr)}
+.tele .ev{padding:7px 0;border-top:1px solid var(--stage-line)}
+.tele .ev:first-child{border-top:0}
+.tele .ev .name{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--k-nodr)}
+.tele .ev .props{color:var(--stage-muted);word-break:break-all}
+.tele .ev .ts{color:var(--stage-muted);font-size:11px}
+.tele h4{margin:14px 0 4px;font-size:14px;font-family:var(--display);font-weight:500;color:var(--stage-ink)}
+
+/* ---- design system refinements ---- */
+.stat .l{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-size:30px;font-weight:600;margin-top:6px}
+.tab{min-height:44px;font-size:13px;font-weight:500;padding:12px 12px;color:var(--ink-2)}
+.tab[aria-selected="true"]{font-weight:600;border-bottom-color:var(--module)}
+.tab .ph{font-size:10px;letter-spacing:.1em;padding:2px 5px}
+.btn{min-height:40px;font-size:13px;font-weight:600;padding:0 16px}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary:hover{background:#0C1730}
+.btn:not(.primary):hover{border-color:var(--ink);color:var(--ink)}
+.appt{border:1px solid var(--ink);padding:6px 8px;box-shadow:none}
+.appt .t{font-size:14px;font-weight:600}
+.appt .n{font-size:12.5px}
+.appt .i{font-style:italic;color:#6B5338;opacity:1;font-size:11.5px}
+.flag{font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px}
+.f-scribe{color:#0B1005}
+.f-gave{text-transform:none;letter-spacing:0}
+.board .cell.hall{background:#F6F2E8}
+.board .time{background:var(--paper)}
+.rec > div:first-child{font-size:22px;font-weight:600;line-height:1.2}
+.rec .why{font-size:13px}
+.rec .why:before{content:"Why: "}
+.rec .fx{font-size:13px}
+.rec .fx b{font-family:var(--display);font-size:17px;font-weight:600}
+.rec .act{border-top:1px solid var(--line);padding-top:14px;margin-top:8px}
+.hero .big{line-height:.85;font-weight:600}
+.hero .cap{font-weight:500;line-height:1.35}
+.tele th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.tele td:first-child{color:var(--k-nodr)}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--module)}
+.eyebrow-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.eyebrow-row .it{font-size:12.5px;font-style:italic;color:var(--muted)}
+.suggest{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.suggest h4{margin:12px 0 0;font-family:var(--display);font-size:20px;font-weight:600;line-height:1.25}
+.suggest p{margin:8px 0 0;font-size:13px;color:var(--ink-2)}
+.readfrom{background:var(--module-soft);border-radius:2px;padding:10px 12px;margin-top:12px}
+.readfrom .l{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.readfrom .b{font-size:12.5px;color:var(--ink);margin-top:3px}
+.hint{border:1px dashed var(--module);background:#EEF2F8;border-radius:2px;padding:6px 8px;margin:1px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;z-index:1;display:none}
+.hint:hover{background:var(--module-soft)}
+.hint .l{display:block;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--module)}
+.hint .t{display:block;font-family:var(--display);font-size:14px;font-weight:600;margin-top:2px}
+.hint .d{display:block;font-size:11px;color:var(--ink-2);margin-top:2px}
+body.phase-3 .hint{display:block}
+.drafted{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:14px;max-width:780px}
+.drafted p{margin:10px 0 0;font-size:13.5px;color:var(--ink);text-wrap:pretty;font-family:var(--display);font-weight:400;line-height:1.5}
+.drafted .act{display:flex;gap:10px;margin-top:14px}
+.prov{font-size:12.5px;color:var(--muted);margin-top:8px;font-style:italic}
+.prov b{font-family:var(--display);font-style:normal;color:var(--ink);font-weight:600}
+
+
+.assist{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--module);border:1px solid var(--module);border-radius:2px;padding:2px 6px;margin-left:8px;vertical-align:middle}
+.assist:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--module)}
+.disclose{font-size:12.5px;color:var(--muted);font-style:italic;margin:12px 0 0;max-width:780px}
+.aimap{margin-top:18px;border-top:1px solid var(--stage-line);padding-top:14px}
+.aimap h2{font-size:15px;margin:0 0 6px}
+.aimap .row{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:start;padding:6px 0;border-top:1px solid var(--stage-line);font-size:12px}
+.aimap .row:first-of-type{border-top:0}
+.aimap .ph{color:var(--stage-muted);font-variant-numeric:tabular-nums}
+.aimap .k{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:2px;white-space:nowrap}
+.aimap .k.ai{background:var(--k-nodr);color:var(--k-nodr-ink)}
+.aimap .k.rules{background:var(--stage-2);color:var(--stage-ink);border:1px solid var(--stage-line)}
+.aimap .k.human{background:var(--k-scribe);color:#0B1005}
+.aimap .row.dim{opacity:.55}
+body.mode-product .aimap{display:none}
+
+
+/* demand side — student booking preview */
+.demand{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.demand{grid-template-columns:1fr}}
+.booking{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.booking .who{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.booking h4{margin:6px 0 2px;font-family:var(--display);font-size:20px;font-weight:600}
+.booking .sub{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.slots{display:grid;gap:6px}
+.slot{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--line-strong);border-radius:2px;background:var(--paper);font-size:13px;cursor:pointer;text-align:left}
+.slot.pick{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.slot .t{font-family:var(--display);font-weight:600;font-size:15px}
+.slot .g{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:2px}
+.slot .g.ok{background:var(--k-scribe);color:#0B1005}
+.slot .g.hall{background:var(--k-nodr);color:var(--k-nodr-ink)}
+.slot .g.wait{background:var(--module-soft);color:var(--module);border:1px solid var(--module)}
+.booking .msg{margin-top:10px;padding:10px 12px;background:var(--module-soft);border-radius:2px;font-size:12.5px;line-height:1.5}
+.booking .act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+:focus-visible{outline:2px solid var(--k-reader);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">RegisterBuddy <span>/ Capacity</span></div>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-pilot" aria-selected="true" data-view="pilot">Pilot report <span class="ph">Phase 0</span></button>
+    <button class="tab" role="tab" id="tab-board" aria-selected="false" data-view="board">Day board <span class="ph">Phase 1</span></button>
+    <button class="tab" role="tab" id="tab-proj" aria-selected="false" data-view="proj">Finals projection <span class="ph">Phase 2</span></button>
+    <button class="tab" role="tab" id="tab-recs" aria-selected="false" data-view="recs">Recommendations <span class="ph">Phase 3</span></button>
+  </div>
+  <div class="site"><b>Lakeside Campus Testing Center</b><br>11 private rooms · Room 3 (12 seats) · 3 readers on staff</div>
+  <div class="demo" role="group" aria-label="Demo controls">
+    <span>Demo</span>
+    <select id="demo-phase" aria-label="Show as of phase">
+      <option value="0">As of Phase 0</option><option value="1">As of Phase 1</option><option value="2">As of Phase 2</option><option value="3" selected>As of Phase 3</option>
+    </select>
+    <label class="sw"><span class="mode-tag" id="mode-tag">Product view</span><button class="tog" role="switch" aria-checked="false" id="mode-switch" aria-label="Presenter view"></button></label>
+  </div>
+</div>
+
+
+<div class="shell">
+  <aside class="rail">
+    <h2>Phases and gates</h2>
+    <p class="lead">Presenter view. Switch to Product view to see exactly what a director has at each phase - nothing more.</p>
+    <div class="viewas" role="group" aria-label="View as of phase">
+      <button data-phase="0" aria-pressed="false">As of Phase 0</button>
+      <button data-phase="1" aria-pressed="false">Phase 1</button>
+      <button data-phase="2" aria-pressed="false">Phase 2</button>
+      <button data-phase="3" aria-pressed="true">Phase 3 (full)</button>
+    </div>
+    <div id="phases"></div>
+    <div class="aimap">
+      <h2>Where AI does the work</h2>
+      <div class="row"><span class="ph">0</span><span>Data pull across 1,130 sites</span><span class="k rules">SQL</span></div>
+      <div class="row"><span class="ph">0</span><span>Building the pilot page in days</span><span class="k ai">AI-built</span></div>
+      <div class="row"><span class="ph">1</span><span>Board, exceptions, stagger rule</span><span class="k rules">Rules</span></div>
+      <div class="row"><span class="ph">1</span><span>Instructor nudges 72 / 48 / 24h</span><span class="k rules">Rules</span></div>
+      <div class="row"><span class="ph">1</span><span>Parsing exam submissions and accommodation letters into structured demand</span><span class="k ai">AI</span></div>
+      <div class="row"><span class="ph">2</span><span>Finals projection - same week last year, adjusted</span><span class="k rules">Stats</span></div>
+      <div class="row"><span class="ph">2</span><span>Booking-page hint and DR waitlist for students</span><span class="k rules">Rules</span></div>
+      <div class="row"><span class="ph">2</span><span>Natural-language what-if on the board</span><span class="k ai">AI</span></div>
+      <div class="row"><span class="ph">3</span><span>Ranked recommendations from a season of exceptions</span><span class="k rules">Rules</span></div>
+      <div class="row"><span class="ph">3</span><span>Suggested placements, drafted cover note</span><span class="k ai">AI · assisted</span></div>
+      <div class="row"><span class="ph">3</span><span>Every apply, send, or move</span><span class="k human">Human</span></div>
+      <div class="row dim"><span class="ph">4</span><span>Same engine in advising, queue mgmt, other portcos</span><span class="k rules">Reuse</span></div>
+      <p class="note" style="margin-top:8px">Honest map for the CEO's ask: AI where it earns its place, rules where rules are enough, a person on every consequential action.</p>
+    </div>
+    <p class="note">Rollback at every phase: flag off, the export still works, the spreadsheet is never deleted. Phase 0 is the flagged report page - a test with telemetry, not a feature.</p>
+  </aside>
+
+  <main class="main">
+
+
+    <!-- PILOT REPORT (Phase 0) -->
+    <section class="view on" id="view-pilot">
+      <div class="viewhead">
+        <h1>Finals capacity report</h1>
+        <span class="sub">Finals, December 2025 · Lakeside Campus Testing Center · <em>Illustrative - built out from one day's board; the pilot uses the full term</em></span>
+      </div>
+      <div class="pilot">
+        <div class="banner"><b>Pilot</b> This report was prepared for ten testing centers from your own registration history. Nothing here is live data - it's a first look at what RegisterBuddy could show you every term. <span class="end">Pilot ends Nov 21</span></div>
+        <div class="hero">
+          <div class="big">15</div>
+          <div class="cap">students entitled to a distraction-reduced room sat in the shared hall on your peak day.<small>Wednesday, December 10, 2025 · 39 entitled · 24 placed privately · 1 waived by written consent</small></div>
+        </div>
+        <div class="strip">
+          <div class="stat"><div class="l">Accommodated appointments, finals week</div><div class="v">212</div></div>
+          <div class="stat bad"><div class="l">Peak-day DR demand vs. DR rooms</div><div class="v">39<small>vs 24 · 163%</small></div></div>
+          <div class="stat warn"><div class="l">Reader shifts scheduled, unused</div><div class="v">4</div></div>
+        </div>
+        <div class="report" style="margin-top:0">
+          <h3>What your peak day looked like</h3>
+          <div class="to">Wednesday, December 10, 2025 · 46 appointments · 11 distraction-reduced rooms · 1 shared hall</div>
+          <table>
+            <tr><td>Students entitled to a distraction-reduced room</td><td>39</td></tr>
+            <tr><td>Placed in a distraction-reduced room</td><td>24</td></tr>
+            <tr><td>Placed in the shared hall instead</td><td>15</td></tr>
+            <tr><td>Accommodations waived by student consent</td><td>1</td></tr>
+            <tr><td>Reader requested, none available</td><td>1</td></tr>
+            <tr><td>Appointments where the exam hadn't arrived</td><td>2</td></tr>
+            <tr><td>Start slots used (10-minute stagger)</td><td>46 of 50</td></tr>
+          </table>
+          <div class="ask">One additional distraction-reduced room on the two peak days would have placed 7 more students. One additional reader on Wednesday would have cleared the wait. Two reader shifts on Dec 15 and 18 went unused.</div>
+          <div class="act" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn primary" id="share-dean">Export budget report (PDF)</button>
+            <button class="btn" id="req-again">I'd want this every term</button>
+          </div>
+        </div>
+        <div class="prompt" id="prompt">
+          <h3>One question: would this change how you staff finals?</h3>
+          <div class="opts">
+            <button class="btn" data-ans="yes">Yes</button>
+            <button class="btn" data-ans="no">No</button>
+            <button class="btn" data-ans="maybe">Not sure</button>
+          </div>
+          <textarea id="prompt-text" placeholder="What would you do differently, or what's missing? (optional)"></textarea>
+          <div style="margin-top:6px"><button class="btn primary" id="prompt-submit">Send</button></div>
+          <div class="thanks" id="prompt-thanks">Thanks - that goes straight to the product team.</div>
+        </div>
+        <p class="note presenter">Everything on this page is a static, aggregate-only export shipped behind a feature flag to ten sites. No student names, no live queries. It exists to answer one question before anything is built: does a director act on this? The telemetry drawer (bottom right) shows exactly what we'd measure.</p>
+      </div>
+    </section>
+
+    <!-- BOARD -->
+    <section class="view" id="view-board">
+      <div class="viewhead">
+        <h1>Wednesday, December 10, 2026</h1>
+        <span class="sub">Finals week · 46 appointments · Live bookings, 3 days out</span>
+      </div>
+      <div class="strip" id="strip"></div>
+      <div class="split">
+        <div>
+          <div class="boardwrap"><div class="board" id="board"></div></div>
+          <div class="key">
+            <span><i style="background:var(--appt)"></i>Appointment</span>
+            <span><i style="background:var(--k-nodr)"></i>DR-entitled, no DR room</span>
+            <span><i style="background:var(--k-reader)"></i>Reader / text-to-speech</span>
+            <span><i style="background:var(--k-scribe)"></i>Scribe needed</span>
+            <span><i style="border:1px solid var(--k-exam)"></i>Exam not received</span>
+            <span><i style="background:var(--k-nodr)"></i>Open start slot (10-min stagger)</span>
+          </div>
+          <p class="note presenter">Same rooms, same colour key as the coordinator's spreadsheet (student and instructor names changed). The difference is that every flag is now a structured event the platform can count, alert on, and learn from.</p>
+        </div>
+        <div>
+          <div class="panel">
+            <h3>Exceptions today <span class="ph">Phase 1</span></h3>
+            <div id="exc"></div>
+          </div>
+          <div class="panel whatif" id="whatif-panel">
+            <h3>What if… <span class="ph">Phase 3</span></h3>
+            <div class="row"><span>Open Room 4 as distraction-reduced</span><button class="tog" role="switch" aria-checked="false" data-wi="room" aria-label="Open Room 4 as distraction-reduced"></button></div>
+            <div class="row"><span>Add one reader for the day</span><button class="tog" role="switch" aria-checked="false" data-wi="reader" aria-label="Add one reader"></button></div>
+            <div class="row"><span>Chase the 2 outstanding exams</span><button class="tog" role="switch" aria-checked="false" data-wi="exam" aria-label="Chase outstanding exams"></button></div>
+            <p class="note" id="wi-note">Toggle a lever to see the day recalculate.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTION -->
+    <section class="view" id="view-proj">
+      <div class="viewhead">
+        <h1>Finals week projection</h1>
+        <span class="sub">Dec 7 – 18 · As of November 17 · 3 weeks out, before bookings exist · <em>Illustrative - shaped from one day; the real projection needs the term history</em></span>
+      </div>
+      <div class="strip">
+        <div class="stat bad"><div class="l">Days over DR-room capacity</div><div class="v">4<small>of 10</small></div></div>
+        <div class="stat warn"><div class="l">Days over-staffed on readers</div><div class="v">2<small>of 10</small></div></div>
+        <div class="stat"><div class="l">Peak day, DR-entitled appointments</div><div class="v">41<small>Wed Dec 10</small></div></div>
+        <div class="stat"><div class="l">DR capacity (11 rooms)</div><div class="v">24<small>appts / day</small></div></div>
+      </div>
+      <div class="chart">
+        <h3>Projected DR-entitled appointments vs. DR-room capacity</h3>
+        <div class="basis">Basis: same finals week 2025 × enrollment +4% × accommodation trend +9%. <span class="prov">Projected from three terms of this center's records. Last term it landed within ±10% on <b>8 of 10</b> days.</span> Bars show the projection; ticks show the range across the last three years. Excludes no-shows and exams not received - both tracked from Phase 1 and folded in once there's a season of data.</div>
+        <div class="bars" id="bars"></div>
+        <div class="days" id="days"></div>
+      </div>
+      <div class="panel alerts">
+        <h3>Alerts <span class="ph">Phase 2</span></h3>
+        <div class="alert"><span class="sev over"></span><div><b>Wed Dec 10 and Thu Dec 11 - projected 41 and 36 DR-entitled appointments against 24 of capacity.</b> Last year this was handled by placing 15 students in Room 3 and asking one to give up her accommodation.</div><span class="when">Over</span></div>
+        <div class="alert"><span class="sev over"></span><div><b>Tue Dec 9 and Wed Dec 17 - projected 29 and 27.</b> Marginal; one extra DR room covers it.</div><span class="when">Over</span></div>
+        <div class="alert"><span class="sev under"></span><div><b>Mon Dec 15 and Fri Dec 18 - 3 readers scheduled, projected need 1.</b> Two reader-shifts you're paying for that history says you won't use.</div><span class="when">Under</span></div>
+        <div class="alert"><span class="sev lead"></span><div><b>Start-time slots: Wed Dec 10 projects 48 of 50 used.</b> Check-in throughput becomes the constraint if either DR lever is pulled without a second check-in desk.</div><span class="when">Watch</span></div>
+      </div>
+
+      <div class="demand">
+        <div class="booking">
+          <div class="who">Student view · booking an exam<span class="assist">rules</span></div>
+          <h4>ECE 3350 final · choose a time</h4>
+          <div class="sub">Your accommodations on file: distraction-reduced room, extended time (1.5x). Any slot is yours to book - this only shows where your room is guaranteed.</div>
+          <div class="slots" id="slots">
+            <button class="slot" data-slot="Tue 8:40"><span><span class="t">Tue Dec 9 · 8:40 AM</span><br>PEC 3 open</span><span class="g ok">DR room guaranteed</span></button>
+            <button class="slot pick" data-slot="Wed 10:30"><span><span class="t">Wed Dec 10 · 10:30 AM</span><br>Private rooms full</span><span class="g hall">Shared hall</span></button>
+            <button class="slot" data-slot="Wed 2:10"><span><span class="t">Wed Dec 10 · 2:10 PM</span><br>Lakeside 1 open</span><span class="g ok">DR room guaranteed</span></button>
+            <button class="slot" data-slot="Thu 9:00"><span><span class="t">Thu Dec 11 · 9:00 AM</span><br>Private rooms full</span><span class="g wait">Waitlist</span></button>
+          </div>
+          <div class="msg" id="slot-msg">You've chosen <b>Wednesday 10:30</b>. Private rooms are full at that time, so you'd sit in the shared hall. Two other times this week have a distraction-reduced room open - or keep 10:30 and join the waitlist.</div>
+          <div class="act"><button class="btn primary" id="keep-slot">Keep Wed 10:30</button><button class="btn" id="join-wait">Join the DR waitlist</button></div>
+        </div>
+        <div class="panel">
+          <h3>Why the demand side comes first <span class="ph">Phase 2</span></h3>
+          <p style="margin:0 0 8px;font-size:13px">This is a matching problem with imperfect information, and demand isn't static. The side with the most flexibility is the student - and because her accommodations persist on her record, the platform knows she needs a DR room before she picks a time. Show her where it's guaranteed. Offer a waitlist. Never block a slot.</p>
+          <p style="margin:0;font-size:13px"><b>The line:</b> this shows a student where her accommodation is <em>guaranteed</em>, never where the center would prefer her. What's measured is how many hinted students move to a guaranteed slot or join the waitlist - and how many keep their original time, which is also a valid answer.</p>
+          <p class="note presenter">Every slot stays bookable. The hint is computed from the room model (Phase 1) and the student's own record - rules, not a model. Events: booking_hint_shown, booking_slot_changed, dr_waitlist_joined.</p>
+        </div>
+      </div>
+      <p class="note presenter">Two horizons, two products. This view serves the director three weeks out, when student workers and overflow rooms get decided. The day board serves the coordinator in the last three days, when the bookings are real.</p>
+    </section>
+
+    <!-- RECOMMENDATIONS -->
+    <section class="view" id="view-recs">
+      <div class="viewhead">
+        <h1>Recommendations for finals week</h1>
+        <span class="sub">Generated from the projection and last year's exceptions · Reviewed by the director, never auto-applied</span>
+      </div>
+      <div class="recs">
+        <div class="rec"><div><b>Open Room 4 as distraction-reduced, Tue–Thu</b></div><div class="why">Room 4 sat empty in the shared pool last December while 15 DR-entitled students went to Room 3.</div><div class="fx">Closes <b>7 of 17</b> projected DR gaps on the peak days. No new cost.</div><div class="act"><button class="btn primary" data-rec="r1">Plan it</button><button class="btn">Dismiss</button></div></div>
+        <div class="rec"><div><b>Add one reader, Wed Dec 10 and Thu Dec 11</b></div><div class="why">Reader-needed and text-to-speech flags cluster on the two peak days; one reader covered them last year with three students waiting.</div><div class="fx">Clears projected reader wait. <b>~$180</b> in student-worker hours.</div><div class="act"><button class="btn primary" data-rec="r2">Plan it</button><button class="btn">Dismiss</button></div></div>
+        <div class="rec"><div><b>Drop reader shifts Mon Dec 15 and Fri Dec 18</b></div><div class="why">Three readers scheduled, one projected to be needed on each day.</div><div class="fx">Saves <b>~$240</b>. Offsets the Wed/Thu add.</div><div class="act"><button class="btn primary" data-rec="r3">Plan it</button><button class="btn">Dismiss</button></div></div>
+        <div class="rec"><div><b>Chase outstanding exams at 48 hours, not on the day</b></div><div class="why">Two of today's 46 appointments have no exam. A student in a DR room with no exam is a wasted slot and a re-booking into a full week.</div><div class="fx">Automatic instructor nudges at 72h / 48h / 24h. <b>Already live from Phase 1</b> - it's a count, not a model.</div><div class="act"><button class="btn primary" data-rec="r4">Turn on</button><button class="btn">Dismiss</button></div></div>
+      </div>
+
+
+      <p class="disclose">Items marked <span class="assist" style="margin:0 4px">assisted</span> were drafted by an assistant from this center's own records. Each shows what it read from. Nothing is moved, sent, or applied until you do it.</p>
+      <div class="recs" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+        <div class="suggest">
+          <div class="eyebrow-row"><span class="eyebrow">Suggested placement<span class="assist">assisted</span></span><span class="it">you decide</span></div>
+          <h4>Move Arjun Malhotra to PEC 3 at 8:40</h4>
+          <p>He's in the shared hall from 10:30 and is entitled to a distraction-reduced room. PEC 3 is empty until 10:50 - the move works only if his start comes forward, so it's a question for him, not a change we make.</p>
+          <div class="readfrom"><div class="l">Read from</div><div class="b">His accommodation record, PEC 3's bookings, and the 10-minute start ledger.</div></div>
+          <div class="act" style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn primary" data-sug="apply">Ask him</button><button class="btn" data-sug="later">Not now</button></div>
+        </div>
+        <div class="drafted">
+          <div class="eyebrow-row"><span class="eyebrow">Drafted for your review<span class="assist">assisted</span></span><span class="it">edit before it leaves the building</span></div>
+          <p>&ldquo;Fifteen students entitled to a distraction-reduced room were seated in the shared hall on our peak day. One additional room on that day would have absorbed the overflow that put the center at 163% of distraction-reduced capacity.&rdquo;</p>
+          <div class="act"><button class="btn primary" data-draft="use">Use this wording</button><button class="btn" data-draft="own">Write my own</button></div>
+          <p class="prov" style="font-family:var(--body)">Cover note for the budget report. Nothing is sent until you do.</p>
+        </div>
+      </div>
+      <div class="report">
+        <h3>Capacity report - finals 2025, for budget review</h3>
+        <div class="to">Lakeside Campus Testing Center · Illustrative figures · Prepared for: <span style="border-bottom:1px dashed var(--line-strong);padding:0 40px 0 4px">&nbsp;</span> · Exported from RegisterBuddy</div>
+        <table>
+          <tr><td>Accommodated appointments, finals week</td><td>212</td></tr>
+          <tr><td>Peak-day DR-entitled demand vs. DR-room capacity</td><td>39 vs 24 (163%)</td></tr>
+          <tr><td>Students entitled to a distraction-reduced room who did not get one</td><td>15</td></tr>
+          <tr><td>Accommodations waived by student consent</td><td>1</td></tr>
+          <tr><td>Appointments where the exam had not arrived</td><td>2</td></tr>
+          <tr><td>Reader shifts scheduled but unused</td><td>4</td></tr>
+        </table>
+        <div class="ask">What one more distraction-reduced room and one additional reader on the two peak days would have changed: 7 fewer students in the shared hall, no waived accommodations, net staffing cost roughly neutral after dropping two unused shifts.</div>
+        <p class="note presenter">This is the document a director takes into whatever conversation decides their staffing - a Dean, an owner, a budget committee. It's built from the exceptions the board captured in Phase 1 - which is why the board comes first.</p>
+      </div>
+    </section>
+
+    <section class="view" id="view-locked"><div class="locked-msg"><b id="locked-title">Not available yet at this phase</b><span id="locked-body"></span></div></section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<button class="tele-btn" id="tele-btn" aria-expanded="false" aria-controls="tele">Pilot telemetry <span class="n" id="tele-count">0</span></button>
+<aside class="tele" id="tele" aria-label="Pilot telemetry">
+  <header><h3>What we'd measure</h3><button class="btn" id="tele-close">Close</button></header>
+  <div class="body">
+    <div class="pass"><b>Test 1 pass condition</b> - at least 5 of 10 pilot sites either export the budget report or answer "yes" to the prompt within the pilot window.<div class="cnt" id="pass-cnt">0 of 10 sites</div><div id="pass-note" style="color:var(--muted)">This session counts as one site. The other nine are mock.</div></div>
+    <h4>Return visits from this browser</h4>
+    <div id="visits">-</div>
+    <h4>Event schema</h4>
+    <table>
+      <tr><th>Event</th><th>Why it matters</th></tr>
+      <tr><td>report_viewed</td><td>Opened the flagged page at all</td></tr>
+      <tr><td>report_return_visit</td><td>Came back without being asked</td></tr>
+      <tr><td>report_exported</td><td>Took it to whoever decides their staffing</td></tr>
+      <tr><td>report_requested_recurring</td><td>Asked for it every term</td></tr>
+      <tr><td>prompt_answered</td><td>The one question, with free text</td></tr>
+      <tr><td>section_time</td><td>Where they actually read</td></tr>
+      <tr><td>view_opened / whatif_toggled / rec_actioned</td><td>Later phases, same pipe</td></tr>
+      <tr><td>booking_hint_shown / booking_slot_changed / dr_waitlist_joined</td><td>Did the demand side move - and how many kept their time, which is also valid</td></tr>
+      <tr><td>placement_suggestion_actioned</td><td>Did they take an assistive suggestion, or dismiss it</td></tr>
+      <tr><td>cover_note_actioned</td><td>Used the drafted wording, or wrote their own</td></tr>
+    </table>
+    <div style="color:var(--muted);font-size:12px">Every event carries site_id, role, phase, and a session id. In the real pilot these go to Mixpanel behind the same flag; here they're logged locally so you can see them fire.</div>
+    <h4>Live events</h4>
+    <div id="events"></div>
+  </div>
+</aside>
+
+<script>
+(function(){
+  // ---------- Mock data: transcribed from the coordinator's spreadsheet ----------
+  const privateRooms = ["PEC 1","PEC 2","PEC 3","PEC 4","PEC 5","PEC 6","Lakeside 0","Lakeside 1","Lakeside 2","Bermuda Triangle","Music Closet"];
+  const hallSeats = 12;
+  const T0 = 8*60+40, T1 = 17*60; // 8:40 – 17:00
+  const step = 10;
+  const rows = (T1 - T0)/step; // 50 slots
+
+  // [room index or "H"+seat, start, end, name, instructor, flags[]]
+  const appts = [
+    [0,"9:00","12:00","Priya Anand","Prof. Ellison",[]],[0,"12:10","14:40","Tomas Reyes","Anderson",[]],[0,"14:40","16:30","Lena Okafor","Prof. Aldridge",[]],
+    [1,"9:30","11:30","Daniel Voss","Prof. Bellamy",[]],[1,"13:00","15:00","Ava Lindqvist","Prof. Castellano",[]],[1,"15:30","16:30","Noor Haddad","Prof. Dorsey",["exam"]],
+    [2,"10:50","14:50","Marcus Bell","Prof. Ellison",[]],[2,"15:15","16:45","Chloe Marchetti","Prof. Fairbanks",[]],
+    [3,"9:50","12:50","Ravi Sethi","Prof. Grimaldi",[]],[3,"13:10","15:40","Elena Petrova","Prof. Hartwell",[]],
+    [4,"11:00","14:00","Owen Fitzgerald","Prof. Ivers",[]],[4,"14:10","17:00","Mei Tanaka","Prof. Jansen",[]],
+    [5,"8:40","11:40","Sofia Duarte","Prof. Ellison",[]],[5,"12:30","15:30","Liam O'Connell","Prof. Kessler",[]],
+    [6,"10:00","12:30","Hana Kowalski","Prof. Lorimer",[]],[6,"13:20","16:20","Jamal Whitfield","Prof. Marsh",["tts","reader"]],
+    [7,"10:20","13:20","Isabel Moreno","Prof. Norwood",[]],[7,"13:40","16:40","Theo Lambert","Prof. Okoro",["tts"]],
+    [8,"11:10","15:10","Amara Osei","Prof. Hartwell",["tts"]],[8,"15:20","17:00","Felix Brandt","Prof. Norwood",[]],
+    [9,"9:10","12:20","Yara Mansour","Prof. Norwood",[]],[9,"12:20","15:20","Caleb Nguyen","Prof. Prakash",[]],
+    [10,"11:20","13:20","Ines Carvalho","Prof. Hartwell",[]],[10,"13:50","16:50","Kofi Mensah","Prof. Quintero",[]],
+    ["H0","10:10","12:40","Zara Iqbal","Prof. Rasmussen",[]],["H0","13:40","17:00","Ben Carlsson","Prof. Ellison",["nodr"]],
+    ["H1","10:45","13:45","Aisha Rahman","Prof. Ellison",["nodr"]],["H1","14:00","17:00","Luca Ferrara","Prof. Salazar · ECE 3350",["nodr","exam"]],
+    ["H2","9:15","11:45","Nadia Popescu","Prof. Tremblay",["nodr","tts"]],["H2","13:15","15:15","Grace Adebayo","Prof. Grimaldi",["gave"]],
+    ["H3","8:50","11:50","Mateo Silva","Prof. Underhill",["nodr"]],["H3","12:20","15:10","Ivy Chen","Prof. Hartwell",["nodr"]],
+    ["H4","9:20","12:20","Samuel Achebe","Prof. Grimaldi",["nodr"]],["H4","13:30","16:00","Freya Holm","Prof. Hartwell",["nodr"]],
+    ["H5","11:30","15:00","Diego Alvarez","Prof. Valdez",[]],["H5","15:00","17:00","Rosa Kim","Prof. Whitaker",["nodr"]],
+    ["H6","10:30","12:30","Arjun Malhotra","Prof. Xu",["nodr"]],["H6","12:50","15:50","Sara Lindgren","Prof. Norwood",[]],
+    ["H7","12:40","15:10","Ezra Cohen","Prof. Yamada",["nodr"]],
+    ["H8","11:30","13:30","Maya Sørensen","Prof. Zielinski",["nodr"]],["H8","14:20","16:50","Jonah Reid","Prof. Ellison",["nodr"]],
+    ["H9","11:40","14:40","Leila Farouk","Prof. Abernathy",[]],["H9","14:50","16:50","Oscar Beaumont","Prof. Brennan",[]],
+    ["H10","11:50","15:50","Nia Thompson","",["nodr"]],
+    ["H11","9:40","12:40","Kai Watanabe","Prof. Cardenas",[]],["H11","14:30","17:00","Amelia Novak","Prof. Hartwell",["nodr"]],
+  ];
+  const mins = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
+  const fmt = m => { const h=Math.floor(m/60), mm=m%60; const ap=h>=12?"PM":"AM"; const hh=((h+11)%12)+1; return `${hh}:${String(mm).padStart(2,"0")} ${ap}`; };
+
+  const state = { phase:3, view:"board", wi:{room:false,reader:false,exam:false}, planned:{} };
+
+  // ---------- Board render ----------
+  const cols = 1 + privateRooms.length + hallSeats;
+  function renderBoard(){
+    const b = document.getElementById("board");
+    b.style.gridTemplateColumns = `76px repeat(${privateRooms.length},minmax(112px,1fr)) repeat(${hallSeats},minmax(96px,1fr))`;
+    b.innerHTML = "";
+    // headers
+    const th = document.createElement("div"); th.className="hd"; th.style.gridRow="1 / span 2"; th.textContent="Start"; b.appendChild(th);
+    privateRooms.forEach(r=>{ const h=document.createElement("div"); h.className="hd"; h.style.gridRow="1 / span 2"; h.innerHTML=`${r}<small>distraction-reduced</small>`; b.appendChild(h); });
+    const hh=document.createElement("div"); hh.className="hd group"; hh.style.gridColumn=`${privateRooms.length+2} / span ${hallSeats}`; hh.style.gridRow="1 / span 2"; hh.innerHTML=`Room 3 - shared hall, 12 seats<small>Stagger start times: 10 minutes per appointment</small>`; b.appendChild(hh);
+    // time column + cells
+    const usedStarts = new Set(appts.map(a=>mins(a[1])));
+    for(let i=0;i<rows;i++){
+      const t = T0 + i*step;
+      const tc=document.createElement("div"); tc.className="time"+(usedStarts.has(t)?" used":(t<T1-60?" free":""));
+      tc.style.gridRow = `${i+3}`; tc.style.gridColumn="1"; tc.textContent=fmt(t); b.appendChild(tc);
+      for(let c=0;c<privateRooms.length+hallSeats;c++){
+        const cell=document.createElement("div"); cell.className="cell"+(c>=privateRooms.length?" hall":""); cell.style.gridRow=`${i+3}`; cell.style.gridColumn=`${c+2}`; b.appendChild(cell);
+      }
+    }
+    // appointments
+    appts.forEach(a=>{
+      const [room,s,e,name,inst,flags]=a;
+      const col = typeof room==="number" ? room+2 : privateRooms.length+2+Number(room.slice(1));
+      const r0 = (mins(s)-T0)/step + 3, span = Math.max(3,(mins(e)-mins(s))/step);
+      const d=document.createElement("div"); d.className="appt"; d.style.gridColumn=`${col}`; d.style.gridRow=`${r0} / span ${span}`;
+      const fl = effectiveFlags(flags);
+      if(flags.length && !fl.length) d.classList.add("resolved");
+      d.innerHTML = `<div class="t">${fmt(mins(s))} – ${fmt(mins(e))}</div><div class="n">${name}</div><div class="i">${inst}</div>` +
+        fl.map(f=>({nodr:'<span class="flag f-nodr">No DR room</span>',reader:'<span class="flag f-reader">Reader needed</span>',tts:'<span class="flag f-tts">Text-to-speech</span>',scribe:'<span class="flag f-scribe">Scribe needed</span>',exam:'<span class="flag f-exam">Exam not received</span>',gave:'<span class="flag f-gave">Gave up DR room</span>'}[f])).join("");
+      d.title = `${name} · ${fmt(mins(s))}–${fmt(mins(e))}`;
+      b.appendChild(d);
+    });
+    const hint=document.createElement("button"); hint.type="button"; hint.className="hint"; hint.style.gridColumn="4"; hint.style.gridRow="3 / span 12";
+    hint.innerHTML='<span class="l">Suggested · assisted</span><span class="t">8:40 · PEC 3</span><span class="d">Arjun Malhotra fits here if his start moves from 10:30. He\'s entitled to a DR room. Ask him?</span>';
+    hint.addEventListener("click",()=>{ track("placement_suggested_opened",{student:"arjun_m",room:"PEC 3",slot:"8:40"}); setView("recs"); });
+    b.appendChild(hint);
+  }
+  // what-if: room opens → first 3 No-DR students resolved; reader → reader flags resolved; exam → exam flags resolved
+  let resolvedNoDr = new Set();
+  function effectiveFlags(flags){
+    return flags.filter(f=>{
+      if(f==="reader" && state.wi.reader) return false;
+      if(f==="exam" && state.wi.exam) return false;
+      if(f==="nodr" && state.wi.room && resolvedNoDr.size<3){ return false; }
+      return true;
+    });
+  }
+  function computeRoomResolved(){
+    resolvedNoDr = new Set();
+    if(!state.wi.room) return;
+    // Room 4 as DR clears 3 appointments (one room turns over ~3 times)
+    let n=0; appts.forEach((a,i)=>{ if(a[5].includes("nodr") && n<3){ resolvedNoDr.add(i); n++; } });
+  }
+
+  // ---------- Strip + exceptions ----------
+  function renderStrip(){
+    const nodr = appts.filter(a=>a[5].includes("nodr")).length;
+    const placed = appts.filter(a=>typeof a[0]==="number").length;
+    const entitled = nodr + placed + 1; // +1 waived
+    const nodrNow = state.wi.room ? nodr-3 : nodr;
+    const readerNeed = appts.filter(a=>a[5].includes("reader")).length;
+    const readerNow = state.wi.reader ? 0 : readerNeed;
+    const examMissing = appts.filter(a=>a[5].includes("exam")).length;
+    const examNow = state.wi.exam ? 0 : examMissing;
+    const slotsUsed = new Set(appts.map(a=>mins(a[1]))).size;
+    const rooms = state.wi.room ? 12 : 11;
+    const stripEl=document.getElementById("strip");
+    stripEl.innerHTML = `
+      <div class="stat ${nodrNow>0?'bad':'ok'}"><div class="l">DR-entitled students without a DR room</div><div class="v">${nodrNow}<small>of ${entitled} entitled</small></div></div>
+      <div class="stat"><div class="l">Distraction-reduced rooms in use</div><div class="v">${rooms}<small>of ${rooms}</small></div></div>
+      <div class="stat ${readerNow>0?'warn':'ok'}"><div class="l">Reader requests without a reader</div><div class="v">${readerNow}<small>${state.wi.reader?'4 readers':'3 readers'} on staff</small></div></div>
+      <div class="stat ${examNow>0?'warn':'ok'}"><div class="l">Exams not yet received</div><div class="v">${examNow}<small>of 46</small></div></div>
+      <div class="stat ${slotsUsed>=46?'warn':''}"><div class="l">Start slots used</div><div class="v">${slotsUsed}<small>of 50</small></div></div>`;
+    const ex=document.getElementById("exc");
+    const items=[];
+    if(nodrNow>0) items.push(`<div class="exc"><span class="dot nodr"></span><div><b>${nodrNow} students placed in Room 3 who are entitled to a distraction-reduced room.</b> One accommodation waived by consent (Grace Adebayo).</div></div>`);
+    else items.push(`<div class="exc"><span class="dot nodr"></span><div><b>Every DR-entitled student has a DR room.</b> Room 4 absorbed the overflow.</div></div>`);
+    if(readerNow>0) items.push(`<div class="exc"><span class="dot reader"></span><div><b>Jamal Whitfield needs a reader at 1:20 PM</b> - all three readers assigned. Three text-to-speech devices in use.</div></div>`);
+    if(examNow>0) items.push(`<div class="exc"><span class="dot exam"></span><div><b>2 exams not received:</b> Prof. Dorsey (Noor Haddad, 3:30 PM) and Prof. Salazar (Luca Ferrara, 2:00 PM). Both are DR-room or hall slots that go to waste if the exam doesn't arrive.</div></div>`);
+    items.push(`<div class="exc"><span class="dot slot"></span><div><b>46 of 50 start slots used.</b> Four appointments could still be added before check-in stacks up.</div></div>`);
+    ex.innerHTML = items.join("");
+    const note=document.getElementById("wi-note");
+    const on=Object.values(state.wi).filter(Boolean).length;
+    note.textContent = on ? `Recalculated. ${state.wi.room?'Opening Room 4 clears three DR gaps. ':''}${state.wi.reader?'A fourth reader clears the wait. ':''}${state.wi.exam?'Exams chased at 48 hours - both slots stay usable. ':''}` : "Toggle a lever to see the day recalculate.";
+  }
+
+  // ---------- Projection ----------
+  const proj = [
+    {d:"Mon 7",v:18,lo:15,hi:21},{d:"Tue 8",v:29,lo:24,hi:33},{d:"Wed 9",v:41,lo:35,hi:46},{d:"Thu 10",v:36,lo:31,hi:40},{d:"Fri 11",v:22,lo:18,hi:26},
+    {d:"Mon 14",v:14,lo:11,hi:17},{d:"Tue 15",v:21,lo:17,hi:25},{d:"Wed 16",v:27,lo:23,hi:31},{d:"Thu 17",v:19,lo:15,hi:23},{d:"Fri 18",v:9,lo:6,hi:12},
+  ];
+  const CAP=24, MAX=50;
+  function renderProj(){
+    const bars=document.getElementById("bars"), days=document.getElementById("days");
+    bars.innerHTML=""; days.innerHTML="";
+    const capLine=document.createElement("div"); capLine.className="cap-line"; capLine.style.bottom=`${CAP/MAX*100}%`; capLine.innerHTML=`<span>DR capacity · 24</span>`; bars.appendChild(capLine);
+    proj.forEach(p=>{
+      const b=document.createElement("div"); b.className="bar";
+      b.innerHTML=`<div class="val">${p.v}</div><div class="ci" style="bottom:${p.lo/MAX*100}%;height:${(p.hi-p.lo)/MAX*100}%"></div><div class="fill${p.v>CAP?' over':''}" style="height:${p.v/MAX*100}%"></div>`;
+      bars.appendChild(b);
+      const dd=document.createElement("div"); dd.textContent=p.d; days.appendChild(dd);
+    });
+  }
+
+  // ---------- Phases rail ----------
+  const phases = [
+    {n:0,name:"Validate",when:"Sept 29 – Oct 10",ship:"Data pull across 1,130 sites + 8–10 director conversations",gate:"≥20% of sites surge ≥1.8× average <b>and</b> ≥5 of 8 directors name a staffing call they got wrong",status:"Passed (mock): 23% of sites, 6 of 8 directors"},
+    {n:1,name:"Sense",when:"Oct 13 – Nov 7",ship:"Day board for 5–8 named pilot sites: rooms with attributes, staff with roles, stagger rule, exceptions as events",gate:"≥5 of 8 pilot sites plan finals week in-platform by Nov 21 - spreadsheet abandoned, per named site",status:"In progress: 3 of 8 sites off Excel"},
+    {n:2,name:"Project and negotiate",when:"Nov 10 – Dec 5",ship:"Finals-week projection + alerts against each site's configured capacity, and the demand side: a booking-page hint and DR waitlist for accommodated students",gate:"Judged on December finals: over-capacity incidents down vs last Dec <b>and</b> directors act on ≥50% of alerts",status:"Ships before finals"},
+    {n:3,name:"Recommend and monetize",when:"Jan – Feb · launch at NCTA",ship:"Recommendations, Dean's capacity report, priced module on the $3,600 tier",gate:"Attach rate in the first renewal cycle",status:"Not started"},
+    {n:4,name:"Portfolio",when:"Spring onward",ship:"Same capacity engine in advising centers, queue management, a second scheduling portco",gate:"Second portco live",status:"Not started"},
+  ];
+  function renderPhases(){
+    const el=document.getElementById("phases"); el.innerHTML="";
+    phases.forEach(p=>{
+      const cls = p.n<state.phase ? "done" : p.n===state.phase ? "active" : "locked";
+      const d=document.createElement("div"); d.className=`phase ${cls}`;
+      d.innerHTML=`<div class="name">Phase ${p.n} - ${p.name}</div><div class="when">${p.when} · ${p.ship}</div><div class="gate"><b>Gate:</b> ${p.gate}</div><span class="status">${p.status}</span>`;
+      el.appendChild(d);
+    });
+  }
+
+
+  // ---------- Pilot telemetry ----------
+  const SITE = "site_lakeside", ROLE = "director";
+  let SESSION; try{ SESSION = sessionStorage.getItem("rb-sess") || Math.random().toString(36).slice(2,8); sessionStorage.setItem("rb-sess",SESSION);}catch(e){ SESSION="s"+Date.now(); }
+  const events = [];
+  function persistedGet(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function persistedSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+  function track(name, props={}){
+    const ev = {name, props:Object.assign({site_id:SITE, role:ROLE, phase:state.phase, session:SESSION}, props), ts:new Date()};
+    events.unshift(ev); if(events.length>60) events.pop();
+    renderTele();
+  }
+  const telem = persistedGet("rb-telem", {visits:0, exported:false, recurring:false, answer:null});
+  function renderTele(){
+    document.getElementById("tele-count").textContent = events.length;
+    const el=document.getElementById("events");
+    el.innerHTML = events.map(e=>`<div class="ev"><div class="name">${e.name}</div><div class="props">${Object.entries(e.props).map(([k,v])=>`${k}=${String(v)}`).join(" · ")}</div><div class="ts">${e.ts.toLocaleTimeString()}</div></div>`).join("") || `<div style="color:var(--muted)">No events yet.</div>`;
+    const thisSite = (telem.exported || telem.answer==="yes") ? 1 : 0;
+    document.getElementById("pass-cnt").textContent = `${thisSite + 3} of 10 sites`; // 3 mock sites already passed
+    document.getElementById("pass-note").textContent = thisSite ? "This site now counts. Three mock sites had already passed." : "This session counts as one site. Three mock sites have already passed; six haven't acted yet.";
+    document.getElementById("visits").textContent = `${telem.visits} visit${telem.visits===1?"":"s"}${telem.visits>1?" - a return visit is itself a signal":""}`;
+  }
+  function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); }
+  document.getElementById("tele-btn").addEventListener("click",()=>{ const d=document.getElementById("tele"); const open=!d.classList.contains("open"); d.classList.toggle("open",open); document.getElementById("tele-btn").setAttribute("aria-expanded",String(open)); });
+  document.getElementById("tele-close").addEventListener("click",()=>{ document.getElementById("tele").classList.remove("open"); document.getElementById("tele-btn").setAttribute("aria-expanded","false"); });
+  document.getElementById("share-dean").addEventListener("click",()=>{ telem.exported=true; persistedSet("rb-telem",telem); track("report_exported",{format:"pdf",purpose:"budget_review"}); toast("PDF exported · report_exported logged"); });
+  document.getElementById("req-again").addEventListener("click",()=>{ telem.recurring=true; persistedSet("rb-telem",telem); track("report_requested_recurring",{}); toast("Noted · report_requested_recurring logged"); });
+  document.querySelectorAll("#prompt [data-ans]").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#prompt [data-ans]").forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); telem.answer=b.dataset.ans; persistedSet("rb-telem",telem); }));
+  document.getElementById("prompt-submit").addEventListener("click",()=>{ const txt=document.getElementById("prompt-text").value.trim(); track("prompt_answered",{answer:telem.answer||"unanswered", text_len:txt.length}); document.getElementById("prompt-thanks").style.display="block"; toast("Sent · prompt_answered logged"); renderTele(); });
+  // section time: log when a view has been open > 5s
+  let viewOpenedAt = Date.now();
+
+
+  // ---------- Modes: product vs presenter ----------
+  function applyMode(presenter){
+    state.presenter = presenter;
+    document.body.classList.toggle("mode-presenter", presenter);
+    document.body.classList.toggle("mode-product", !presenter);
+    document.getElementById("mode-switch").setAttribute("aria-checked", String(presenter));
+    document.getElementById("mode-tag").textContent = presenter ? "Presenter view" : "Product view";
+    try{ localStorage.setItem("rb-mode", presenter ? "presenter":"product"); }catch(e){}
+    refreshTabs();
+  }
+  function refreshTabs(){
+    const minPhase = {pilot:0, board:1, proj:2, recs:3};
+    document.querySelectorAll(".tab").forEach(t=>{
+      const locked = state.phase < minPhase[t.dataset.view];
+      // product view: later tabs don't exist; presenter view: they show and explain the lock
+      if(!state.presenter){ t.hidden = locked; } else { t.hidden = false; }
+    });
+    // if current view isn't available in product mode, fall back to the highest available
+    if(!state.presenter && state.phase < minPhase[state.view]){
+      const order=["recs","proj","board","pilot"]; const v=order.find(x=>minPhase[x]<=state.phase); setView(v);
+    }
+  }
+  document.getElementById("mode-switch").addEventListener("click",()=>{ applyMode(!state.presenter); track("mode_toggled",{presenter:state.presenter}); });
+  document.getElementById("demo-phase").addEventListener("change",e=>{ setPhase(Number(e.target.value)); });
+  document.addEventListener("keydown",e=>{ if((e.key==="p"||e.key==="P") && !/input|textarea|select/i.test(document.activeElement.tagName)){ applyMode(!state.presenter); } });
+
+
+  document.querySelectorAll(".slot").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".slot").forEach(x=>x.classList.remove("pick")); b.classList.add("pick");
+    const g=b.querySelector(".g").textContent; const t=b.dataset.slot;
+    const m=document.getElementById("slot-msg"); const keep=document.getElementById("keep-slot");
+    if(g.startsWith("DR room")){ m.innerHTML=`You've chosen <b>${t}</b>. A distraction-reduced room is guaranteed at that time.`; keep.textContent=`Book ${t}`; }
+    else if(g==="Waitlist"){ m.innerHTML=`You've chosen <b>${t}</b>. Private rooms are full then - you can book it and join the waitlist, and we'll tell you the moment a room opens.`; keep.textContent=`Book ${t}`; }
+    else { m.innerHTML=`You've chosen <b>${t}</b>. Private rooms are full at that time, so you'd sit in the shared hall. Two other times this week have a distraction-reduced room open - or keep ${t} and join the waitlist.`; keep.textContent=`Keep ${t}`; }
+    track("booking_slot_changed",{to:t,guaranteed:g.startsWith("DR room")});
+  }));
+  document.getElementById("keep-slot").addEventListener("click",()=>{ track("booking_confirmed",{slot:document.querySelector(".slot.pick").dataset.slot}); toast("Booked · booking_confirmed logged"); });
+  document.getElementById("join-wait").addEventListener("click",()=>{ track("dr_waitlist_joined",{slot:document.querySelector(".slot.pick").dataset.slot}); toast("On the waitlist · dr_waitlist_joined logged"); });
+
+  // ---------- View / phase control ----------
+  const lockedCopy = {
+    proj:{1:"Projection unlocks after the Phase 1 gate. Until pilot sites have configured rooms and staff in-platform, there is nothing for a forecast to compare against."},
+    recs:{1:"Recommendations unlock after Phase 2.",2:"Recommendations unlock after the Phase 2 gate: they're generated from the projection and a season of captured exceptions, and they only earn their place if directors acted on the alerts."}
+  };
+  function setView(v){
+    if(state.view && state.view!==v){ const dt=Math.round((Date.now()-viewOpenedAt)/1000); if(dt>=5) track("section_time",{view:state.view,seconds:dt}); }
+    viewOpenedAt=Date.now(); if(state.view!==v) track("view_opened",{view:v});
+    state.view=v;
+    document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===v ? "true":"false"));
+    const lockedFor = (v==="board"&&state.phase<1) || (v==="proj"&&state.phase<2) || (v==="recs"&&state.phase<3);
+    document.querySelectorAll(".view").forEach(s=>s.classList.remove("on"));
+    if(lockedFor){
+      const titles={board:"Day board",proj:"Finals projection",recs:"Recommendations"};
+      document.getElementById("locked-title").textContent = titles[v]+" - not yet at Phase "+state.phase;
+      document.getElementById("locked-body").textContent = (lockedCopy[v]&&(lockedCopy[v][state.phase]||lockedCopy[v][1])) || "Unlocks after the Phase 0 gate: the data pull and ten directors have to say this is worth building first.";
+      document.getElementById("view-locked").classList.add("on");
+    } else {
+      document.getElementById("view-"+v).classList.add("on");
+    }
+  }
+  function setPhase(p){
+    if(state.phase!==p) track("phase_view_changed",{to:p});
+    state.phase=p;
+    document.body.className = document.body.className.replace(/\bphase-\d\b/g,"").trim() + " phase-"+p;
+    document.querySelectorAll(".viewas button").forEach(b=>b.setAttribute("aria-pressed", Number(b.dataset.phase)===p ? "true":"false"));
+    document.getElementById("whatif-panel").style.display = p>=3 ? "" : "none";
+    document.getElementById("demo-phase").value = String(p);
+    renderPhases(); refreshTabs(); setView(state.view);
+  }
+  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>setView(t.dataset.view)));
+  document.querySelectorAll(".viewas button").forEach(b=>b.addEventListener("click",()=>setPhase(Number(b.dataset.phase))));
+  document.querySelectorAll(".tog").forEach(t=>t.addEventListener("click",()=>{
+    const k=t.dataset.wi; state.wi[k]=!state.wi[k]; t.setAttribute("aria-checked",String(state.wi[k])); track("whatif_toggled",{lever:k,on:state.wi[k]});
+    computeRoomResolved(); renderBoard(); renderStrip();
+  }));
+  document.querySelectorAll("[data-sug]").forEach(b=>b.addEventListener("click",()=>{ track("placement_suggestion_actioned",{student:"arjun_m",action:b.dataset.sug}); toast(b.dataset.sug==="apply"?"Message drafted to the student · placement_suggestion_actioned":"Dismissed · placement_suggestion_actioned"); }));
+  document.querySelectorAll("[data-draft]").forEach(b=>b.addEventListener("click",()=>{ track("cover_note_actioned",{choice:b.dataset.draft}); toast(b.dataset.draft==="use"?"Wording added to the report · cover_note_actioned":"Opening a blank note · cover_note_actioned"); }));
+  document.querySelectorAll("[data-rec]").forEach(b=>b.addEventListener("click",()=>{
+    const on = b.getAttribute("aria-pressed")==="true";
+    track("rec_actioned",{rec:b.dataset.rec,action:on?"unplanned":"planned"});
+    b.setAttribute("aria-pressed", String(!on)); b.textContent = on ? (b.dataset.rec==="r4"?"Turn on":"Plan it") : (b.dataset.rec==="r4"?"\u2713\u2002On":"\u2713\u2002Planned");
+  }));
+
+  try{ const t=localStorage.getItem("rb-cap-phase"); if(t) state.phase=Number(t); }catch(e){}
+  telem.visits=(telem.visits||0)+1; persistedSet("rb-telem",telem);
+  let presenterInit=false; try{ const q=new URLSearchParams(location.search); if(q.get("presenter")==="1") presenterInit=true; else if(q.get("presenter")==="0") presenterInit=false; else presenterInit = localStorage.getItem("rb-mode")==="presenter"; }catch(e){}
+  state.presenter=presenterInit;
+  renderBoard(); renderStrip(); renderProj(); renderPhases(); state.view="pilot"; applyMode(presenterInit); setPhase(state.phase); state.view=null; setView("pilot");
+  track(telem.visits>1?"report_return_visit":"report_viewed",{visit_n:telem.visits}); renderTele();
+  document.querySelectorAll(".viewas button").forEach(b=>b.addEventListener("click",()=>{ try{localStorage.setItem("rb-cap-phase",b.dataset.phase);}catch(e){} }));
+})();
+</script>
+</body>
+</html>
