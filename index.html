@@ -397,9 +397,9 @@ body.mode-presenter .main{padding:22px 28px 56px}
       <div class="row"><span class="ph">0</span><span>Data pull across 1,130 sites</span><span class="k rules">SQL</span></div>
       <div class="row"><span class="ph">0</span><span>Building the pilot page in days</span><span class="k ai">AI-built</span></div>
       <div class="row"><span class="ph">1</span><span>Board, exceptions, stagger rule</span><span class="k rules">Rules</span></div>
-      <div class="row"><span class="ph">1</span><span>Instructor nudges 72 / 48 / 24h</span><span class="k rules">Rules</span></div>
+      <div class="row"><span class="ph">1</span><span>Instructor nudges 72 / 48 / 24h, in Canvas / Blackboard</span><span class="k rules">Rules</span></div>
       <div class="row"><span class="ph">1</span><span>Parsing exam submissions and accommodation letters into structured demand</span><span class="k ai">AI</span></div>
-      <div class="row"><span class="ph">2</span><span>Finals projection - same week last year, adjusted</span><span class="k rules">Stats</span></div>
+      <div class="row"><span class="ph">2</span><span>Projection - declared demand from Banner, LMS and accommodations office, plus last year's residual</span><span class="k rules">Ledger</span></div>
       <div class="row"><span class="ph">2</span><span>Booking-page hint and DR waitlist for students</span><span class="k rules">Rules</span></div>
       <div class="row"><span class="ph">2</span><span>Natural-language what-if on the board</span><span class="k ai">AI</span></div>
       <div class="row"><span class="ph">3</span><span>Ranked recommendations from a season of exceptions</span><span class="k rules">Rules</span></div>
@@ -515,7 +515,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
       </div>
       <div class="chart">
         <h3>Projected DR-entitled appointments vs. DR-room capacity</h3>
-        <div class="basis">Same finals week last year, adjusted for enrollment and accommodation trend. <span class="prov">Last term this landed within ±10% on <b>8 of 10</b> days.</span><span class="presenter"> Ticks show the three-year range. Excludes no-shows and exams not received until there's a season of Phase 1 data.</span></div>
+        <div class="basis">Declared demand, read from the systems already integrated: enrollment and modality from Banner, online-course declarations through the LMS, the accommodated roster from the accommodations office. Last year's numbers cover only the residual - late listings, walk-ins, no-shows. <span class="prov">Last term this landed within ±10% on <b>8 of 10</b> days.</span><span class="presenter"> Ticks show the three-year range. Excludes no-shows and exams not received until there's a season of Phase 1 data.</span></div>
         <div class="bars" id="bars"></div>
         <div class="days" id="days"></div>
       </div>
@@ -531,7 +531,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
         <div class="booking">
           <div class="who">Student view · booking an exam<span class="assist">rules</span></div>
           <h4>ECE 3350 final · choose a time</h4>
-          <div class="sub">On file: distraction-reduced room, extended time (1.5x). Any slot is yours - this shows where your room is guaranteed.</div>
+          <div class="sub">On file from the accommodations office: distraction-reduced room, extended time (1.5x). Any slot is yours - this shows where your room is guaranteed.</div>
           <div class="slots" id="slots">
             <button class="slot" data-slot="Tue 8:40"><span><span class="t">Tue Dec 9 · 8:40 AM</span><br>PEC 3 open</span><span class="g ok">DR room guaranteed</span></button>
             <button class="slot pick" data-slot="Wed 10:30"><span><span class="t">Wed Dec 10 · 10:30 AM</span><br>Private rooms full</span><span class="g hall">Shared hall</span></button>
@@ -571,7 +571,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
           <div class="eyebrow-row"><span class="eyebrow">Suggested placement<span class="assist">assisted</span></span><span class="it">you decide</span></div>
           <h4>Move Arjun Malhotra to PEC 3 at 8:40</h4>
           <p>He's in the shared hall from 10:30 and is entitled to a distraction-reduced room. PEC 3 is empty until 10:50 - the move works only if his start comes forward, so it's a question for him, not a change we make.</p>
-          <div class="readfrom"><div class="l">Read from</div><div class="b">His accommodation record, PEC 3's bookings, and the 10-minute start ledger.</div></div>
+          <div class="readfrom"><div class="l">Read from</div><div class="b">His accommodation record from the accommodations office, PEC 3's bookings, and the 10-minute start ledger.</div></div>
           <div class="act" style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn primary" data-sug="apply">Ask him</button><button class="btn" data-sug="later">Not now</button></div>
         </div>
         <div class="drafted">
@@ -779,8 +779,8 @@ body.mode-presenter .main{padding:22px 28px 56px}
 
   // ---------- Phases rail ----------
   const phases = [
-    {n:0,name:"Validate",when:"Sept 29 – Oct 10",ship:"Data pull across 1,130 sites + 8–10 director conversations",gate:"≥20% of sites surge ≥1.8× average <b>and</b> ≥5 of 8 directors name a staffing call they got wrong",status:"Passed (mock): 23% of sites, 6 of 8 directors"},
-    {n:1,name:"Sense",when:"Oct 13 – Nov 7",ship:"Day board for 5–8 named pilot sites: rooms with attributes, staff with roles, stagger rule, exceptions as events",gate:"≥5 of 8 pilot sites plan finals week in-platform by Nov 21 - spreadsheet abandoned, per named site",status:"In progress: 3 of 8 sites off Excel"},
+    {n:0,name:"Validate",when:"Sept 29 – Oct 10",ship:"Data pull across 1,130 sites, ten named sites recruited, interviews, and Test 1: this flagged report page",gate:"≥20% of sites surge ≥1.8× average <b>and</b> ≥5 of 8 directors name a staffing call they got wrong",status:"Passed (mock): 23% of sites, 6 of 8 directors"},
+    {n:1,name:"Sense",when:"Oct 13 – Nov 7",ship:"The board for the ten sites, from live bookings on ordinary days from launch - rooms, staff, stagger rule, exceptions as events. Instructor nudges in Canvas / Blackboard",gate:"≥5 of 8 large sites plan finals week in-platform by Nov 21 - spreadsheet abandoned, per named site, which she only does at finals if she trusted it in October",status:"In progress: 3 of 8 sites off Excel"},
     {n:2,name:"Project and negotiate",when:"Nov 10 – Dec 5",ship:"Finals-week projection + alerts against each site's configured capacity, and the demand side: a booking-page hint and DR waitlist for accommodated students",gate:"Judged on December finals: over-capacity incidents down vs last Dec <b>and</b> directors act on ≥50% of alerts",status:"Ships before finals"},
     {n:3,name:"Recommend and monetize",when:"Jan – Feb · launch at NCTA",ship:"Recommendations, Dean's capacity report, priced module on the $3,600 tier",gate:"Attach rate in the first renewal cycle",status:"Not started"},
     {n:4,name:"Portfolio",when:"Spring onward",ship:"Same capacity engine in advising centers, queue management, a second scheduling portco",gate:"Second portco live",status:"Not started"},
