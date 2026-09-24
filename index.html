@@ -408,7 +408,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
       <div class="row dim"><span class="ph">4</span><span>Same engine in advising, queue mgmt, other portcos</span><span class="k rules">Reuse</span></div>
       <p class="note" style="margin-top:8px">Honest map for the CEO's ask: AI where it earns its place, rules where rules are enough, a person on every consequential action.</p>
     </div>
-    <p class="note">Rollback at every phase: flag off, the export still works, the spreadsheet is never deleted. Phase 0 is the flagged report page - a test with telemetry, not a feature.</p>
+    <p class="note">Rollback at every phase: flag off, the export still works, recorded assignments and exceptions are kept. Phase 0 is the flagged report page - a test with telemetry, not a feature.</p>
   </aside>
 
   <main class="main">
@@ -428,7 +428,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
         </div>
         <div class="strip">
           <div class="stat"><div class="l">Accommodated appointments, finals week</div><div class="v">212</div></div>
-          <div class="stat bad"><div class="l">Peak-day DR demand vs. DR rooms</div><div class="v">39<small>vs 24 · 163%</small></div></div>
+          <div class="stat bad"><div class="l">Entitled to a DR room, peak day</div><div class="v">39<small>24 placed privately</small></div></div>
           <div class="stat warn"><div class="l">Reader shifts scheduled, unused</div><div class="v">4</div></div>
         </div>
         <div class="report" style="margin-top:0">
@@ -443,7 +443,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
             <tr><td>Appointments where the exam hadn't arrived</td><td>2</td></tr>
             <tr><td>Start slots used (10-minute stagger)</td><td>46 of 50</td></tr>
           </table>
-          <div class="ask">One additional distraction-reduced room on the two peak days would have placed 7 more students. One additional reader on Wednesday would have cleared the wait. Two reader shifts on Dec 15 and 18 went unused.</div>
+          <div class="ask">Fifteen students entitled to a distraction-reduced room sat in the shared hall on your peak day, and one reader request went unmet. Two reader shifts on Dec 15 and 18 went unused. What another room or reader would have changed depends on your hours and turnover - the pilot is how we find out.</div>
           <div class="act" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
             <button class="btn primary" id="share-dean">Export budget report (PDF)</button>
             <button class="btn" id="req-again">I'd want this every term</button>
@@ -531,11 +531,11 @@ body.mode-presenter .main{padding:22px 28px 56px}
         <div class="booking">
           <div class="who">Student view · booking an exam<span class="assist">rules</span></div>
           <h4>ECE 3350 final · choose a time</h4>
-          <div class="sub">On file from the accommodations office: distraction-reduced room, extended time (1.5x). Any slot is yours - this shows where your room is guaranteed.</div>
+          <div class="sub">On file from the accommodations office: distraction-reduced room, extended time (1.5x). Any slot within your exam window is yours - this shows where a DR room is open.</div>
           <div class="slots" id="slots">
-            <button class="slot" data-slot="Tue 8:40"><span><span class="t">Tue Dec 9 · 8:40 AM</span><br>PEC 3 open</span><span class="g ok">DR room guaranteed</span></button>
+            <button class="slot" data-slot="Tue 8:40"><span><span class="t">Tue Dec 9 · 8:40 AM</span><br>PEC 3 open</span><span class="g ok">DR room open</span></button>
             <button class="slot pick" data-slot="Wed 10:30"><span><span class="t">Wed Dec 10 · 10:30 AM</span><br>Private rooms full</span><span class="g hall">Shared hall</span></button>
-            <button class="slot" data-slot="Wed 2:10"><span><span class="t">Wed Dec 10 · 2:10 PM</span><br>Lakeside 1 open</span><span class="g ok">DR room guaranteed</span></button>
+            <button class="slot" data-slot="Wed 2:10"><span><span class="t">Wed Dec 10 · 2:10 PM</span><br>Lakeside 1 open</span><span class="g ok">DR room open</span></button>
             <button class="slot" data-slot="Thu 9:00"><span><span class="t">Thu Dec 11 · 9:00 AM</span><br>Private rooms full</span><span class="g wait">Waitlist</span></button>
           </div>
           <div class="msg" id="slot-msg">You've chosen <b>Wednesday 10:30</b>. Private rooms are full at that time, so you'd sit in the shared hall. Two other times this week have a distraction-reduced room open - or keep 10:30 and join the waitlist.</div>
@@ -543,8 +543,8 @@ body.mode-presenter .main{padding:22px 28px 56px}
         </div>
         <div class="panel presenter">
           <h3>Why the demand side comes first <span class="ph">Phase 2</span></h3>
-          <p style="margin:0 0 8px;font-size:13px">This is a matching problem with imperfect information, and demand isn't static. The side with the most flexibility is the student - and because her accommodations persist on her record, the platform knows she needs a DR room before she picks a time. Show her where it's guaranteed. Offer a waitlist. Never block a slot.</p>
-          <p style="margin:0;font-size:13px"><b>The line:</b> this shows a student where her accommodation is <em>guaranteed</em>, never where the center would prefer her. What's measured is how many hinted students move to a guaranteed slot or join the waitlist - and how many keep their original time, which is also a valid answer.</p>
+          <p style="margin:0 0 8px;font-size:13px">This is a matching problem with imperfect information, and demand isn't static. The side with the most flexibility is the student - and because her accommodations persist on her record, the platform knows she needs a DR room before she picks a time. Show her where a room is open, within her exam window. Offer a waitlist. Never block a slot.</p>
+          <p style="margin:0;font-size:13px"><b>The line:</b> this shows a student where her accommodation can actually be met, within her instructor's exam window - never where the center would prefer her. Nothing is reserved until the coordinator places her. What's measured is how many hinted students move to an open slot or join the waitlist, whether that reduces conflicts or just moves them, and how many keep their original time - which is also a valid answer.</p>
           <p class="note presenter">Every slot stays bookable. The hint is computed from the room model (Phase 1) and the student's own record - rules, not a model. Events: booking_hint_shown, booking_slot_changed, dr_waitlist_joined.</p>
         </div>
       </div>
@@ -576,7 +576,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
         </div>
         <div class="drafted">
           <div class="eyebrow-row"><span class="eyebrow">Drafted for your review<span class="assist">assisted</span></span><span class="it">edit before it leaves the building</span></div>
-          <p>&ldquo;Fifteen students entitled to a distraction-reduced room were seated in the shared hall on our peak day. One additional room on that day would have absorbed the overflow that put the center at 163% of distraction-reduced capacity.&rdquo;</p>
+          <p>&ldquo;Fifteen students entitled to a distraction-reduced room were seated in the shared hall on our peak day. We're asking for the resources to meet that requirement on the days demand is highest.&rdquo;</p>
           <div class="act"><button class="btn primary" data-draft="use">Use this wording</button><button class="btn" data-draft="own">Write my own</button></div>
           <p class="prov" style="font-family:var(--body)">Cover note for the budget report. Nothing is sent until you do.</p>
         </div>
@@ -586,7 +586,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
         <div class="to">Lakeside Campus Testing Center · Illustrative figures · Prepared for: <span style="border-bottom:1px dashed var(--line-strong);padding:0 40px 0 4px">&nbsp;</span> · Exported from RegisterBuddy</div>
         <table>
           <tr><td>Accommodated appointments, finals week</td><td>212</td></tr>
-          <tr><td>Peak-day DR-entitled demand vs. DR-room capacity</td><td>39 vs 24 (163%)</td></tr>
+          <tr><td>Peak-day students entitled to a DR room / placed privately</td><td>39 / 24</td></tr>
           <tr><td>Students entitled to a distraction-reduced room who did not get one</td><td>15</td></tr>
           <tr><td>Accommodations waived by student consent</td><td>1</td></tr>
           <tr><td>Appointments where the exam had not arrived</td><td>2</td></tr>
@@ -607,7 +607,7 @@ body.mode-presenter .main{padding:22px 28px 56px}
 <aside class="tele" id="tele" aria-label="Pilot telemetry">
   <header><h3>What we'd measure</h3><button class="btn" id="tele-close">Close</button></header>
   <div class="body">
-    <div class="pass"><b>Test 1 pass condition</b> - at least 5 of 10 pilot sites either export the budget report or answer "yes" to the prompt within the pilot window.<div class="cnt" id="pass-cnt">0 of 10 sites</div><div id="pass-note" style="color:var(--muted)">This session counts as one site. The other nine are mock.</div></div>
+    <div class="pass"><b>Test 1 pass condition</b> - at least 4 of the 6 large sites either export the budget report or answer "yes" to the prompt within the pilot window.<div class="cnt" id="pass-cnt">0 of 6 large sites</div><div id="pass-note" style="color:var(--muted)">This session counts as one site. The other nine are mock.</div></div>
     <h4>Return visits from this browser</h4>
     <div id="visits">-</div>
     <h4>Event schema</h4>
@@ -779,11 +779,11 @@ body.mode-presenter .main{padding:22px 28px 56px}
 
   // ---------- Phases rail ----------
   const phases = [
-    {n:0,name:"Validate",when:"Sept 29 – Oct 10",ship:"Data pull across 1,130 sites, ten named sites recruited, interviews, and Test 1: this flagged report page",gate:"≥20% of sites surge ≥1.8× average <b>and</b> ≥5 of 8 directors name a staffing call they got wrong",status:"Passed (mock): 23% of sites, 6 of 8 directors"},
-    {n:1,name:"Sense",when:"Oct 13 – Nov 7",ship:"The board for the ten sites, from live bookings on ordinary days from launch - rooms, staff, stagger rule, exceptions as events. Instructor nudges in Canvas / Blackboard",gate:"≥5 of 8 large sites plan finals week in-platform by Nov 21 - spreadsheet abandoned, per named site, which she only does at finals if she trusted it in October",status:"In progress: 3 of 8 sites off Excel"},
-    {n:2,name:"Project and negotiate",when:"Nov 10 – Dec 5",ship:"Finals-week projection + alerts against each site's configured capacity, and the demand side: a booking-page hint and DR waitlist for accommodated students",gate:"Judged on December finals: over-capacity incidents down vs last Dec <b>and</b> directors act on ≥50% of alerts",status:"Ships before finals"},
-    {n:3,name:"Recommend and monetize",when:"Jan – Feb · launch at NCTA",ship:"Recommendations, Dean's capacity report, priced module on the $3,600 tier",gate:"Attach rate in the first renewal cycle",status:"Not started"},
-    {n:4,name:"Portfolio",when:"Spring onward",ship:"Same capacity engine in advising centers, queue management, a second scheduling portco",gate:"Second portco live",status:"Not started"},
+    {n:0,name:"Validate",when:"Sept 29 – Oct 10",ship:"Data pull across 1,130 sites, ten named sites recruited, interviews, and Test 1: this flagged report page",gate:"≥20% of sites surge ≥1.8× · ≥4 of 6 large-site directors name a staffing call they got wrong <b>and</b> act on the report",status:"Passed (mock): 23% of sites, 5 of 6 directors"},
+    {n:1,name:"Sense",when:"Oct 13 – Nov 7",ship:"Must-have: the capacity model for the ten sites - rooms, staff, hours, exceptions as events. The board, from live bookings, where allocation is the pain. Nudges in the LMS if LTI supports it, email if not",gate:"Nov 7: ≥4 of 6 large sites have rooms, staff and hours configured and are logging exceptions. Board sites plan finals in-platform by Nov 21",status:"In progress: 3 of 6 configured"},
+    {n:2,name:"Project and negotiate",when:"Nov 10 – Dec 5",ship:"Projection from declared demand, expected and higher case, against configured capacity - by hand if the code slips. Booking hint within the exam window, plus a DR waitlist",gate:"Judged on December: unmet DR requirements down vs last Dec (like-for-like) <b>and</b> ≥3 of 6 sites document a decision the forecast changed. Alerts classified; unactionable or wrong ones come off",status:"Ships ≥3 weeks before each site's finals"},
+    {n:3,name:"Recommend and monetize",when:"Jan – Feb",ship:"Costed recommendations, never auto-applied · budget report as a button · $1,200 module on the $3,600 tier",gate:"Purchasing decision from ≥2 pilot buyers, then attach in the first renewal cycle",status:"Not started"},
+    {n:4,name:"Portfolio",when:"Later",ship:"Same capacity engine in advising centers, queue management, or a second scheduling portco - a hypothesis",gate:"A second use case validated",status:"Not started"},
   ];
   function renderPhases(){
     const el=document.getElementById("phases"); el.innerHTML="";
@@ -813,8 +813,8 @@ body.mode-presenter .main{padding:22px 28px 56px}
     const el=document.getElementById("events");
     el.innerHTML = events.map(e=>`<div class="ev"><div class="name">${e.name}</div><div class="props">${Object.entries(e.props).map(([k,v])=>`${k}=${String(v)}`).join(" · ")}</div><div class="ts">${e.ts.toLocaleTimeString()}</div></div>`).join("") || `<div style="color:var(--muted)">No events yet.</div>`;
     const thisSite = (telem.exported || telem.answer==="yes") ? 1 : 0;
-    document.getElementById("pass-cnt").textContent = `${thisSite + 3} of 10 sites`; // 3 mock sites already passed
-    document.getElementById("pass-note").textContent = thisSite ? "This site now counts. Three mock sites had already passed." : "This session counts as one site. Three mock sites have already passed; six haven't acted yet.";
+    document.getElementById("pass-cnt").textContent = `${thisSite + 3} of 6 large sites`; // 3 mock sites already passed
+    document.getElementById("pass-note").textContent = thisSite ? "This site now counts. Three mock sites had already passed." : "This session counts as one site. Three mock sites have already passed; two haven't acted yet.";
     document.getElementById("visits").textContent = `${telem.visits} visit${telem.visits===1?"":"s"}${telem.visits>1?" - a return visit is itself a signal":""}`;
   }
   function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); }
@@ -859,10 +859,10 @@ body.mode-presenter .main{padding:22px 28px 56px}
     document.querySelectorAll(".slot").forEach(x=>x.classList.remove("pick")); b.classList.add("pick");
     const g=b.querySelector(".g").textContent; const t=b.dataset.slot;
     const m=document.getElementById("slot-msg"); const keep=document.getElementById("keep-slot");
-    if(g.startsWith("DR room")){ m.innerHTML=`You've chosen <b>${t}</b>. A distraction-reduced room is guaranteed at that time.`; keep.textContent=`Book ${t}`; }
+    if(g.startsWith("DR room")){ m.innerHTML=`You've chosen <b>${t}</b>. A distraction-reduced room is open at that time - your room is confirmed when the testing center places you.`; keep.textContent=`Book ${t}`; }
     else if(g==="Waitlist"){ m.innerHTML=`You've chosen <b>${t}</b>. Private rooms are full then - you can book it and join the waitlist, and we'll tell you the moment a room opens.`; keep.textContent=`Book ${t}`; }
     else { m.innerHTML=`You've chosen <b>${t}</b>. Private rooms are full at that time, so you'd sit in the shared hall. Two other times this week have a distraction-reduced room open - or keep ${t} and join the waitlist.`; keep.textContent=`Keep ${t}`; }
-    track("booking_slot_changed",{to:t,guaranteed:g.startsWith("DR room")});
+    track("booking_slot_changed",{to:t,dr_room_open:g.startsWith("DR room")});
   }));
   document.getElementById("keep-slot").addEventListener("click",()=>{ track("booking_confirmed",{slot:document.querySelector(".slot.pick").dataset.slot}); toast("Booked · booking_confirmed logged"); });
   document.getElementById("join-wait").addEventListener("click",()=>{ track("dr_waitlist_joined",{slot:document.querySelector(".slot.pick").dataset.slot}); toast("On the waitlist · dr_waitlist_joined logged"); });
