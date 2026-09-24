@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
 <title>RegisterBuddy — Capacity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -17,16 +18,6 @@
   --radius:3px;
   --display:"Fraunces","Iowan Old Style","Palatino Linotype",Georgia,serif;
   --body:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
-}
-:root:not([data-theme="light"]){ @media (prefers-color-scheme: dark){
-  --paper:#15171B; --surface:#1D2026; --ink:#E8E4DA; --ink-2:#CFCAC0; --muted:#9AA0AC; --line:#2E323A; --line-strong:#464C57;
-  --module:#6E9FD8; --module-ink:#0F1726; --module-soft:#1E2A3D;
-  --appt:#6E4A2E; --appt-ink:#F5E7D6; --k-nodr:#D9BE1F; --k-nodr-ink:#1A1600;
-}}
-:root[data-theme="dark"]{
-  --paper:#15171B; --surface:#1D2026; --ink:#E8E4DA; --ink-2:#CFCAC0; --muted:#9AA0AC; --line:#2E323A; --line-strong:#464C57;
-  --module:#6E9FD8; --module-ink:#0F1726; --module-soft:#1E2A3D;
-  --appt:#6E4A2E; --appt-ink:#F5E7D6; --k-nodr:#D9BE1F; --k-nodr-ink:#1A1600;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;font-feature-settings:"tnum" 1}
@@ -316,6 +307,46 @@ body.mode-product .aimap{display:none}
 .booking .msg{margin-top:10px;padding:10px 12px;background:var(--module-soft);border-radius:2px;font-size:12.5px;line-height:1.5}
 .booking .act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 
+
+/* ---- layout: center on wide screens ---- */
+.topbar{padding-left:max(20px,calc((100vw - 1600px)/2 + 20px));padding-right:max(20px,calc((100vw - 1600px)/2 + 20px))}
+.shell{max-width:1600px;margin:0 auto;width:100%}
+body.mode-product .main{max-width:1280px;margin:0 auto;padding:28px 28px 56px}
+body.mode-presenter .main{padding:22px 28px 56px}
+.strip{max-width:1100px}
+.split{grid-template-columns:minmax(0,1fr) 320px}
+/* ---- hierarchy ---- */
+.viewhead{margin-bottom:18px;padding-bottom:12px}
+.viewhead h1{font-size:28px}
+.viewhead .sub{font-size:13px}
+.viewhead .sub em{color:var(--muted);font-style:italic}
+.panel h3{font-size:17px}
+.panel p{color:var(--ink-2)}
+.chart .basis{font-size:12.5px;max-width:640px}
+.disclose{font-size:12px;max-width:640px}
+.pilot .banner{font-size:12.5px}
+.booking .sub{font-size:12.5px;max-width:520px}
+.recs .rec .why{font-size:12.5px}
+
+
+/* ---- board fixes ---- */
+.board .hd{display:flex;flex-direction:column;justify-content:flex-end;padding:8px 6px 6px;line-height:1.15}
+.board .hd small{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appt .t{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appt .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appt:not(.short) .n{white-space:normal;line-height:1.2}
+.appt .i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appt.short .i{display:none}
+.appt.short{padding:4px 6px}
+.appt.tiny .n{font-size:11.5px}
+.appt.tiny .flag{padding:1px 4px;font-size:9.5px}
+.boardwrap{position:relative}
+.boardwrap:after{content:"";position:absolute;top:0;right:0;bottom:0;width:36px;pointer-events:none;background:linear-gradient(to right,rgba(251,249,245,0),rgba(251,249,245,.9))}
+.scrollhint{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin:0 0 6px}
+.scrollhint span:last-child{font-style:italic}
+.hint{padding:6px 7px}
+.hint .d{font-size:10.5px;line-height:1.3}
+
 :focus-visible{outline:2px solid var(--k-reader);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -330,7 +361,7 @@ body.mode-product .aimap{display:none}
     <button class="tab" role="tab" id="tab-proj" aria-selected="false" data-view="proj">Finals projection <span class="ph">Phase 2</span></button>
     <button class="tab" role="tab" id="tab-recs" aria-selected="false" data-view="recs">Recommendations <span class="ph">Phase 3</span></button>
   </div>
-  <div class="site"><b>Lakeside Campus Testing Center</b><br>11 private rooms · Room 3 (12 seats) · 3 readers on staff</div>
+  <div class="site"><b>Lakeside Campus Testing Center</b><br>11 private rooms · 1 shared hall · 3 readers</div>
   <div class="demo" role="group" aria-label="Demo controls">
     <span>Demo</span>
     <select id="demo-phase" aria-label="Show as of phase">
@@ -381,7 +412,7 @@ body.mode-product .aimap{display:none}
         <span class="sub">Finals, December 2025 · Lakeside Campus Testing Center · <em>Illustrative - built out from one day's board; the pilot uses the full term</em></span>
       </div>
       <div class="pilot">
-        <div class="banner"><b>Pilot</b> This report was prepared for ten testing centers from your own registration history. Nothing here is live data - it's a first look at what RegisterBuddy could show you every term. <span class="end">Pilot ends Nov 21</span></div>
+        <div class="banner"><b>Pilot</b> Prepared from your own registration history - a first look at what RegisterBuddy could show you every term. <span class="end">Pilot ends Nov 21</span></div>
         <div class="hero">
           <div class="big">15</div>
           <div class="cap">students entitled to a distraction-reduced room sat in the shared hall on your peak day.<small>Wednesday, December 10, 2025 · 39 entitled · 24 placed privately · 1 waived by written consent</small></div>
@@ -433,6 +464,7 @@ body.mode-product .aimap{display:none}
       <div class="strip" id="strip"></div>
       <div class="split">
         <div>
+          <div class="scrollhint"><span>Eleven private rooms, then Room 3 (12 seats)</span><span>Scroll right for Lakeside, Bermuda Triangle, Music Closet and Room 3 →</span></div>
           <div class="boardwrap"><div class="board" id="board"></div></div>
           <div class="key">
             <span><i style="background:var(--appt)"></i>Appointment</span>
@@ -474,7 +506,7 @@ body.mode-product .aimap{display:none}
       </div>
       <div class="chart">
         <h3>Projected DR-entitled appointments vs. DR-room capacity</h3>
-        <div class="basis">Basis: same finals week 2025 × enrollment +4% × accommodation trend +9%. <span class="prov">Projected from three terms of this center's records. Last term it landed within ±10% on <b>8 of 10</b> days.</span> Bars show the projection; ticks show the range across the last three years. Excludes no-shows and exams not received - both tracked from Phase 1 and folded in once there's a season of data.</div>
+        <div class="basis">Same finals week last year, adjusted for enrollment and accommodation trend. <span class="prov">Last term this landed within ±10% on <b>8 of 10</b> days.</span><span class="presenter"> Ticks show the three-year range. Excludes no-shows and exams not received until there's a season of Phase 1 data.</span></div>
         <div class="bars" id="bars"></div>
         <div class="days" id="days"></div>
       </div>
@@ -490,7 +522,7 @@ body.mode-product .aimap{display:none}
         <div class="booking">
           <div class="who">Student view · booking an exam<span class="assist">rules</span></div>
           <h4>ECE 3350 final · choose a time</h4>
-          <div class="sub">Your accommodations on file: distraction-reduced room, extended time (1.5x). Any slot is yours to book - this only shows where your room is guaranteed.</div>
+          <div class="sub">On file: distraction-reduced room, extended time (1.5x). Any slot is yours - this shows where your room is guaranteed.</div>
           <div class="slots" id="slots">
             <button class="slot" data-slot="Tue 8:40"><span><span class="t">Tue Dec 9 · 8:40 AM</span><br>PEC 3 open</span><span class="g ok">DR room guaranteed</span></button>
             <button class="slot pick" data-slot="Wed 10:30"><span><span class="t">Wed Dec 10 · 10:30 AM</span><br>Private rooms full</span><span class="g hall">Shared hall</span></button>
@@ -500,7 +532,7 @@ body.mode-product .aimap{display:none}
           <div class="msg" id="slot-msg">You've chosen <b>Wednesday 10:30</b>. Private rooms are full at that time, so you'd sit in the shared hall. Two other times this week have a distraction-reduced room open - or keep 10:30 and join the waitlist.</div>
           <div class="act"><button class="btn primary" id="keep-slot">Keep Wed 10:30</button><button class="btn" id="join-wait">Join the DR waitlist</button></div>
         </div>
-        <div class="panel">
+        <div class="panel presenter">
           <h3>Why the demand side comes first <span class="ph">Phase 2</span></h3>
           <p style="margin:0 0 8px;font-size:13px">This is a matching problem with imperfect information, and demand isn't static. The side with the most flexibility is the student - and because her accommodations persist on her record, the platform knows she needs a DR room before she picks a time. Show her where it's guaranteed. Offer a waitlist. Never block a slot.</p>
           <p style="margin:0;font-size:13px"><b>The line:</b> this shows a student where her accommodation is <em>guaranteed</em>, never where the center would prefer her. What's measured is how many hinted students move to a guaranteed slot or join the waitlist - and how many keep their original time, which is also a valid answer.</p>
@@ -524,7 +556,7 @@ body.mode-product .aimap{display:none}
       </div>
 
 
-      <p class="disclose">Items marked <span class="assist" style="margin:0 4px">assisted</span> were drafted by an assistant from this center's own records. Each shows what it read from. Nothing is moved, sent, or applied until you do it.</p>
+      <p class="disclose">Items marked <span class="assist" style="margin:0 4px">assisted</span> were drafted from this center's own records and show what they read from. Nothing is applied until you do it.</p>
       <div class="recs" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
         <div class="suggest">
           <div class="eyebrow-row"><span class="eyebrow">Suggested placement<span class="assist">assisted</span></span><span class="it">you decide</span></div>
@@ -626,6 +658,7 @@ body.mode-product .aimap{display:none}
   ];
   const mins = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
   const fmt = m => { const h=Math.floor(m/60), mm=m%60; const ap=h>=12?"PM":"AM"; const hh=((h+11)%12)+1; return `${hh}:${String(mm).padStart(2,"0")} ${ap}`; };
+  const fmtRange = (a,b) => { const f=m=>{const h=Math.floor(m/60),mm=m%60;return `${((h+11)%12)+1}:${String(mm).padStart(2,"0")}`;}; const ap=b>=12*60?"PM":"AM"; return `${f(a)}–${f(b)} ${ap}`; };
 
   const state = { phase:3, view:"board", wi:{room:false,reader:false,exam:false}, planned:{} };
 
@@ -633,37 +666,38 @@ body.mode-product .aimap{display:none}
   const cols = 1 + privateRooms.length + hallSeats;
   function renderBoard(){
     const b = document.getElementById("board");
-    b.style.gridTemplateColumns = `76px repeat(${privateRooms.length},minmax(112px,1fr)) repeat(${hallSeats},minmax(96px,1fr))`;
+    b.style.gridTemplateColumns = `76px repeat(${privateRooms.length},minmax(118px,1fr)) repeat(${hallSeats},minmax(100px,1fr))`;
+    b.style.gridTemplateRows = `56px repeat(${rows},14px)`;
     b.innerHTML = "";
     // headers
-    const th = document.createElement("div"); th.className="hd"; th.style.gridRow="1 / span 2"; th.textContent="Start"; b.appendChild(th);
-    privateRooms.forEach(r=>{ const h=document.createElement("div"); h.className="hd"; h.style.gridRow="1 / span 2"; h.innerHTML=`${r}<small>distraction-reduced</small>`; b.appendChild(h); });
-    const hh=document.createElement("div"); hh.className="hd group"; hh.style.gridColumn=`${privateRooms.length+2} / span ${hallSeats}`; hh.style.gridRow="1 / span 2"; hh.innerHTML=`Room 3 - shared hall, 12 seats<small>Stagger start times: 10 minutes per appointment</small>`; b.appendChild(hh);
+    const th = document.createElement("div"); th.className="hd"; th.style.gridRow="1"; th.textContent="Start"; b.appendChild(th);
+    privateRooms.forEach(r=>{ const h=document.createElement("div"); h.className="hd"; h.style.gridRow="1"; h.innerHTML=`${r}<small>distraction-reduced</small>`; b.appendChild(h); });
+    const hh=document.createElement("div"); hh.className="hd group"; hh.style.gridColumn=`${privateRooms.length+2} / span ${hallSeats}`; hh.style.gridRow="1"; hh.innerHTML=`Room 3 - shared hall, 12 seats<small>Stagger start times: 10 minutes per appointment</small>`; b.appendChild(hh);
     // time column + cells
     const usedStarts = new Set(appts.map(a=>mins(a[1])));
     for(let i=0;i<rows;i++){
       const t = T0 + i*step;
       const tc=document.createElement("div"); tc.className="time"+(usedStarts.has(t)?" used":(t<T1-60?" free":""));
-      tc.style.gridRow = `${i+3}`; tc.style.gridColumn="1"; tc.textContent=fmt(t); b.appendChild(tc);
+      tc.style.gridRow = `${i+2}`; tc.style.gridColumn="1"; tc.textContent=fmt(t); b.appendChild(tc);
       for(let c=0;c<privateRooms.length+hallSeats;c++){
-        const cell=document.createElement("div"); cell.className="cell"+(c>=privateRooms.length?" hall":""); cell.style.gridRow=`${i+3}`; cell.style.gridColumn=`${c+2}`; b.appendChild(cell);
+        const cell=document.createElement("div"); cell.className="cell"+(c>=privateRooms.length?" hall":""); cell.style.gridRow=`${i+2}`; cell.style.gridColumn=`${c+2}`; b.appendChild(cell);
       }
     }
     // appointments
     appts.forEach(a=>{
       const [room,s,e,name,inst,flags]=a;
       const col = typeof room==="number" ? room+2 : privateRooms.length+2+Number(room.slice(1));
-      const r0 = (mins(s)-T0)/step + 3, span = Math.max(3,(mins(e)-mins(s))/step);
-      const d=document.createElement("div"); d.className="appt"; d.style.gridColumn=`${col}`; d.style.gridRow=`${r0} / span ${span}`;
+      const r0 = Math.round((mins(s)-T0)/step) + 2, span = Math.max(3,Math.round((mins(e)-mins(s))/step));
+      const d=document.createElement("div"); d.className="appt"+(span<=8?" short":"")+(span<=5?" tiny":""); d.style.gridColumn=`${col}`; d.style.gridRow=`${r0} / span ${span}`;
       const fl = effectiveFlags(flags);
       if(flags.length && !fl.length) d.classList.add("resolved");
-      d.innerHTML = `<div class="t">${fmt(mins(s))} – ${fmt(mins(e))}</div><div class="n">${name}</div><div class="i">${inst}</div>` +
+      d.innerHTML = `<div class="t">${fmtRange(mins(s),mins(e))}</div><div class="n">${name}</div><div class="i">${inst}</div>` +
         fl.map(f=>({nodr:'<span class="flag f-nodr">No DR room</span>',reader:'<span class="flag f-reader">Reader needed</span>',tts:'<span class="flag f-tts">Text-to-speech</span>',scribe:'<span class="flag f-scribe">Scribe needed</span>',exam:'<span class="flag f-exam">Exam not received</span>',gave:'<span class="flag f-gave">Gave up DR room</span>'}[f])).join("");
       d.title = `${name} · ${fmt(mins(s))}–${fmt(mins(e))}`;
       b.appendChild(d);
     });
-    const hint=document.createElement("button"); hint.type="button"; hint.className="hint"; hint.style.gridColumn="4"; hint.style.gridRow="3 / span 12";
-    hint.innerHTML='<span class="l">Suggested · assisted</span><span class="t">8:40 · PEC 3</span><span class="d">Arjun Malhotra fits here if his start moves from 10:30. He\'s entitled to a DR room. Ask him?</span>';
+    const hint=document.createElement("button"); hint.type="button"; hint.className="hint"; hint.style.gridColumn="4"; hint.style.gridRow="2 / span 12";
+    hint.innerHTML='<span class="l">Suggested · assisted</span><span class="t">8:40 · PEC 3</span><span class="d">Arjun Malhotra - entitled to a DR room, in the hall at 10:30. Fits here if his start moves. Ask him?</span>';
     hint.addEventListener("click",()=>{ track("placement_suggested_opened",{student:"arjun_m",room:"PEC 3",slot:"8:40"}); setView("recs"); });
     b.appendChild(hint);
   }
@@ -688,7 +722,7 @@ body.mode-product .aimap{display:none}
   function renderStrip(){
     const nodr = appts.filter(a=>a[5].includes("nodr")).length;
     const placed = appts.filter(a=>typeof a[0]==="number").length;
-    const entitled = nodr + placed + 1; // +1 waived
+    const entitled = nodr + placed; // 39; the waived student is counted separately
     const nodrNow = state.wi.room ? nodr-3 : nodr;
     const readerNeed = appts.filter(a=>a[5].includes("reader")).length;
     const readerNow = state.wi.reader ? 0 : readerNeed;
@@ -709,7 +743,7 @@ body.mode-product .aimap{display:none}
     else items.push(`<div class="exc"><span class="dot nodr"></span><div><b>Every DR-entitled student has a DR room.</b> Room 4 absorbed the overflow.</div></div>`);
     if(readerNow>0) items.push(`<div class="exc"><span class="dot reader"></span><div><b>Jamal Whitfield needs a reader at 1:20 PM</b> - all three readers assigned. Three text-to-speech devices in use.</div></div>`);
     if(examNow>0) items.push(`<div class="exc"><span class="dot exam"></span><div><b>2 exams not received:</b> Prof. Dorsey (Noor Haddad, 3:30 PM) and Prof. Salazar (Luca Ferrara, 2:00 PM). Both are DR-room or hall slots that go to waste if the exam doesn't arrive.</div></div>`);
-    items.push(`<div class="exc"><span class="dot slot"></span><div><b>46 of 50 start slots used.</b> Four appointments could still be added before check-in stacks up.</div></div>`);
+    items.push(`<div class="exc"><span class="dot slot"></span><div><b>${slotsUsed} of 50 start slots used.</b> ${50-slotsUsed} appointments could still be added before check-in stacks up.</div></div>`);
     ex.innerHTML = items.join("");
     const note=document.getElementById("wi-note");
     const on=Object.values(state.wi).filter(Boolean).length;
