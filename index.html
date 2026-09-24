@@ -347,6 +347,15 @@ body.mode-presenter .main{padding:22px 28px 56px}
 .hint{padding:6px 7px}
 .hint .d{font-size:10.5px;line-height:1.3}
 
+
+/* ---- sticky stacking: time column above cards, Start corner above both ---- */
+.board .time{z-index:3;box-shadow:1px 0 0 var(--line-strong)}
+.board .hd{z-index:2}
+.board .hd.corner{position:sticky;left:0;top:0;z-index:5;background:var(--surface)}
+.appt,.hint{z-index:1}
+.board .hd.group{display:block;text-align:left}
+.board .hd.group .stick{position:sticky;left:84px;display:inline-block;text-align:center;padding:0 8px}
+
 :focus-visible{outline:2px solid var(--k-reader);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -670,9 +679,9 @@ body.mode-presenter .main{padding:22px 28px 56px}
     b.style.gridTemplateRows = `56px repeat(${rows},14px)`;
     b.innerHTML = "";
     // headers
-    const th = document.createElement("div"); th.className="hd"; th.style.gridRow="1"; th.textContent="Start"; b.appendChild(th);
+    const th = document.createElement("div"); th.className="hd corner"; th.style.gridRow="1"; th.style.gridColumn="1"; th.textContent="Start"; b.appendChild(th);
     privateRooms.forEach(r=>{ const h=document.createElement("div"); h.className="hd"; h.style.gridRow="1"; h.innerHTML=`${r}<small>distraction-reduced</small>`; b.appendChild(h); });
-    const hh=document.createElement("div"); hh.className="hd group"; hh.style.gridColumn=`${privateRooms.length+2} / span ${hallSeats}`; hh.style.gridRow="1"; hh.innerHTML=`Room 3 - shared hall, 12 seats<small>Stagger start times: 10 minutes per appointment</small>`; b.appendChild(hh);
+    const hh=document.createElement("div"); hh.className="hd group"; hh.style.gridColumn=`${privateRooms.length+2} / span ${hallSeats}`; hh.style.gridRow="1"; hh.innerHTML=`<span class="stick">Room 3 - shared hall, 12 seats<small>Stagger start times: 10 minutes per appointment</small></span>`; b.appendChild(hh);
     // time column + cells
     const usedStarts = new Set(appts.map(a=>mins(a[1])));
     for(let i=0;i<rows;i++){
